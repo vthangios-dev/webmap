@@ -28,7 +28,7 @@
   const heroIconCache = new Map();
   const mapImage = new Image();
   mapImage.onload = () => renderMap();
-  mapImage.src = "/assets/icons/minimap.png";
+  mapImage.src = "/assets/icons/map.png";
 
   function clamp01(value) {
     const n = Number(value);
