@@ -46,6 +46,20 @@ Body mẫu:
 }
 ```
 
+`mapFrame` (tuỳ chọn) để stream minimap thật từ game:
+
+```json
+{
+  "mapFrame": {
+    "mime": "image/jpeg",
+    "data": "<base64>",
+    "w": 320,
+    "h": 320,
+    "ts": 1728838800456
+  }
+}
+```
+
 Test nhanh:
 
 ```bash

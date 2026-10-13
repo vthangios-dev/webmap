@@ -11,7 +11,7 @@ const MAP_INGEST_TOKEN = process.env.MAP_INGEST_TOKEN || "";
 const INGEST_AUTH_ENABLED = MAP_INGEST_TOKEN.trim().length > 0;
 
 const app = express();
-app.use(express.json({ limit: "256kb" }));
+app.use(express.json({ limit: "3mb" }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -53,12 +53,35 @@ function sanitizeEntity(entity) {
 function sanitizePayload(input) {
   const entities = Array.isArray(input.entities) ? input.entities : [];
   const selfTeam = safeNumber(input?.meta?.selfTeam, 0);
+  const rawFrame = input?.mapFrame;
+  let mapFrame = null;
+  if (rawFrame && typeof rawFrame === "object") {
+    const mime = String(rawFrame.mime || "image/jpeg").toLowerCase();
+    const data = String(rawFrame.data || "");
+    const width = Math.max(1, Math.min(1024, safeNumber(rawFrame.w, 0)));
+    const height = Math.max(1, Math.min(1024, safeNumber(rawFrame.h, 0)));
+    if (
+      (mime === "image/jpeg" || mime === "image/png" || mime === "image/webp") &&
+      data.length > 100 &&
+      data.length <= 2_500_000 &&
+      /^[A-Za-z0-9+/=]+$/.test(data)
+    ) {
+      mapFrame = {
+        mime,
+        data,
+        w: width,
+        h: height,
+        ts: safeNumber(rawFrame.ts, nowMs())
+      };
+    }
+  }
   return {
     ts: safeNumber(input.ts, nowMs()),
     meta: {
       selfTeam
     },
-    entities: entities.map(sanitizeEntity)
+    entities: entities.map(sanitizeEntity),
+    mapFrame
   };
 }
 

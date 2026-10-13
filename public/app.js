@@ -19,7 +19,9 @@
     retry: 0,
     room: "",
     lastReceived: 0,
-    frame: null
+    frame: null,
+    mapFrameKey: "",
+    mapFrameImage: null
   };
 
   let video = null;
@@ -29,6 +31,20 @@
 
   function status(text) {
     $("status").textContent = text;
+  }
+
+  function updateMapFrame(frame) {
+    const mf = frame?.mapFrame;
+    if (!mf || !mf.data) return;
+    const key = `${mf.ts || 0}:${mf.data.length}`;
+    if (key === socketState.mapFrameKey) return;
+    socketState.mapFrameKey = key;
+    const image = new Image();
+    image.onload = () => {
+      socketState.mapFrameImage = image;
+      renderMap();
+    };
+    image.src = `data:${mf.mime || "image/jpeg"};base64,${mf.data}`;
   }
 
   function setButtonText(id, text) {
@@ -90,6 +106,8 @@
 
   function resetFrame() {
     socketState.frame = null;
+    socketState.mapFrameKey = "";
+    socketState.mapFrameImage = null;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
     $("latency").textContent = "RTT —";
@@ -122,6 +140,13 @@
     };
     return {
       camp: Number(msg?.payload?.meta?.selfTeam || 0),
+      mapFrame: msg?.payload?.mapFrame && typeof msg.payload.mapFrame === "object"
+        ? {
+            mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
+            data: String(msg.payload.mapFrame.data || ""),
+            ts: Number(msg.payload.mapFrame.ts || 0)
+          }
+        : null,
       actors: entities.map((e) => ({
         id: String(e.id || ""),
         name: String(e.name || ""),
@@ -179,6 +204,7 @@
             if (!parsed) return;
             socketState.frame = parsed;
             socketState.lastReceived = performance.now();
+            updateMapFrame(parsed);
             const count = parsed.actors.length;
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
             setPerspectiveText(parsed.camp ? `Góc nhìn Team ${parsed.camp}` : "Đang nhận dữ liệu trực tiếp");
@@ -291,7 +317,9 @@
   function background() {
     ctx.fillStyle = "#182734";
     ctx.fillRect(0, 0, 900, 900);
-    if (mapImageLoaded) {
+    if (socketState.mapFrameImage) {
+      ctx.drawImage(socketState.mapFrameImage, 0, 0, 900, 900);
+    } else if (mapImageLoaded) {
       ctx.drawImage(icons.terrain, 0, 0, 900, 900);
     }
   }
