@@ -207,6 +207,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--line-2);
   background: #161c25;
+  aspect-ratio: 1 / 1;
 }
 
 canvas {
@@ -230,19 +231,11 @@ canvas {
   font-size: 34px;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
   background:
-    linear-gradient(150deg, rgba(255, 154, 82, 0.14), transparent 35%),
-    linear-gradient(215deg, rgba(74, 215, 179, 0.14), transparent 40%),
-    linear-gradient(180deg, rgba(29, 36, 45, 0.92), rgba(23, 30, 38, 0.94));
-}
-
-.map-message::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 72%);
-  transform: translateX(-65%);
-  animation: sheen 5s linear infinite;
+    linear-gradient(45deg, rgba(73, 147, 255, 0.18) 25%, transparent 25%, transparent 75%, rgba(73, 147, 255, 0.18) 75%),
+    linear-gradient(45deg, rgba(44, 108, 204, 0.2) 25%, transparent 25%, transparent 75%, rgba(44, 108, 204, 0.2) 75%),
+    linear-gradient(180deg, rgba(15, 28, 49, 0.9), rgba(10, 20, 36, 0.94));
+  background-size: 36px 36px, 36px 36px, 100% 100%;
+  background-position: 0 0, 18px 18px, 0 0;
 }
 
 .map-message[hidden] {
@@ -398,17 +391,7 @@ body.compact .android-note {
 
 @media (min-width: 861px) {
   .arena {
-    max-width: 860px;
-  }
-
-  .frame {
-    aspect-ratio: 16 / 9;
-  }
-
-  canvas {
-    height: 100%;
-    object-fit: contain;
-    aspect-ratio: auto;
+    max-width: 760px;
   }
 }
 
@@ -453,14 +436,5 @@ body.compact .android-note {
   .arena-actions .btn-text,
   .head-actions .btn-text {
     display: none;
-  }
-}
-
-@keyframes sheen {
-  0% {
-    transform: translateX(-65%);
-  }
-  100% {
-    transform: translateX(65%);
   }
 }
