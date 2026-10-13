@@ -31,6 +31,14 @@
   let mapFrameDecodeBusy = false;
   const heroIconCache = new Map();
 
+  function clamp01(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    if (n <= 0) return 0;
+    if (n >= 1) return 1;
+    return n;
+  }
+
   function getHeroIcon(heroId) {
     if (!heroId) return null;
     const key = String(heroId);
@@ -84,7 +92,7 @@
   function updateMapFrame(frame) {
     const mf = frame?.mapFrame;
     if (!mf || !mf.data) return;
-    const key = `${mf.ts || 0}:${mf.data.length}`;
+    const key = `${mf.ts || 0}:${mf.data.length}:${mf.w || 0}x${mf.h || 0}`;
     if (key === socketState.mapFrameKey) return;
     socketState.pendingMapFrame = {
       key,
@@ -204,6 +212,8 @@
         ? {
             mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
             data: String(msg.payload.mapFrame.data || ""),
+            w: Number(msg.payload.mapFrame.w || 0),
+            h: Number(msg.payload.mapFrame.h || 0),
             ts: Number(msg.payload.mapFrame.ts || 0)
           }
         : null
@@ -347,17 +357,32 @@
     }
   }
 
+  function drawLiveMapFrameBackground() {
+    const image = socketState.mapFrameImage;
+    if (!image) return false;
+
+    const srcW = image.naturalWidth || image.width || 0;
+    const srcH = image.naturalHeight || image.height || 0;
+    if (srcW < 2 || srcH < 2) return false;
+
+    const side = Math.min(srcW, srcH);
+    const sx = Math.max(0, Math.floor((srcW - side) * 0.5));
+    const sy = Math.max(0, Math.floor((srcH - side) * 0.5));
+
+    ctx.fillStyle = "#0b1220";
+    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+    ctx.save();
+    const prevSmooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.filter = "contrast(1.22) saturate(1.16) brightness(1.08)";
+    ctx.drawImage(image, sx, sy, side, side, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+    ctx.imageSmoothingEnabled = prevSmooth;
+    ctx.restore();
+    return true;
+  }
+
   function background(showLiveFrame) {
-    if (showLiveFrame && socketState.mapFrameImage) {
-      ctx.fillStyle = "#0b1220";
-      ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-      ctx.save();
-      const prevSmooth = ctx.imageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = false;
-      ctx.filter = "contrast(1.22) saturate(1.16) brightness(1.08)";
-      ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-      ctx.imageSmoothingEnabled = prevSmooth;
-      ctx.restore();
+    if (showLiveFrame && drawLiveMapFrameBackground()) {
       return;
     }
 
@@ -384,8 +409,8 @@
       if (actor.dead) continue;
       if (!enemyOnly && !actor.visible) continue;
       if (enemyOnly && (actor.isSelf || (frame.camp > 0 && actor.team === frame.camp))) continue;
-      const x = Math.max(0, Math.min(1, actor.x)) * LOGICAL_MAP_SIZE;
-      const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
+      const x = clamp01(actor.x) * LOGICAL_MAP_SIZE;
+      const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
       const radius = enemyOnly ? 14 : (self ? 10 : 7);
@@ -445,8 +470,10 @@
     const frame = socketState.frame;
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
+    const frameHasMapFrame = !!frame?.mapFrame?.data;
+    const hasLiveMapFrame = frameHasMapFrame && !!socketState.mapFrameImage;
     setLiveBadge(live);
-    background(live);
+    background(hasLiveMapFrame);
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
     if (!live) {
@@ -458,9 +485,8 @@
         : socketState.lastReceived
           ? "Luồng phát đã dừng"
           : "Chưa có dữ liệu";
-
     if (!live) return;
-    const hasLiveMapFrame = !!socketState.mapFrameImage;
+    if (!live) return;
     drawActors(frame, hasLiveMapFrame);
     return;
   }
