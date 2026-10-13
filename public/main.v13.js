@@ -386,16 +386,15 @@
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
 
-      const hpArcStart = Math.PI * 0.2;
-      const hpArcEnd = Math.PI * 0.8;
-      const hpArcSpan = hpArcEnd - hpArcStart;
       const hpLineWidth = self ? 5 : 4;
       const hpRadius = radius + (self ? 4 : 3);
+      const hpArcStart = -Math.PI / 2;
+      const hpArcSpan = Math.PI * 2;
       ctx.beginPath();
       ctx.strokeStyle = "rgba(20, 26, 40, 0.86)";
       ctx.lineWidth = hpLineWidth;
       ctx.lineCap = "round";
-      ctx.arc(x, y, hpRadius, hpArcStart, hpArcEnd);
+      ctx.arc(x, y, hpRadius, 0, Math.PI * 2);
       ctx.stroke();
       if (hpRate > 0.01) {
         const hpColor = hpRate > 0.65
