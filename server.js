@@ -38,6 +38,7 @@ function clamp01(n) {
 
 function sanitizeEntity(entity) {
   const heroId = Math.max(0, safeNumber(entity.heroId, 0));
+  const recalling = Boolean(entity.recalling);
   return {
     id: String(entity.id || ""),
     name: String(entity.name || ""),
@@ -48,6 +49,8 @@ function sanitizeEntity(entity) {
     y: clamp01(entity.y),
     dead: Boolean(entity.dead),
     isSelf: Boolean(entity.isSelf),
+    recalling,
+    recallProgress: recalling ? clamp01(entity.recallProgress) : 0,
     visible: entity.visible === undefined ? true : Boolean(entity.visible),
     hp: Math.max(0, safeNumber(entity.hp, 0)),
     maxHp: Math.max(1, safeNumber(entity.maxHp, 1))

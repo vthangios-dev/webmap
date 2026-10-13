@@ -178,7 +178,9 @@
         maxHp: Number(entity?.maxHp || 1),
         dead: !!entity?.dead,
         visible: entity?.visible !== false,
-        isSelf: !!entity?.isSelf
+        isSelf: !!entity?.isSelf,
+        recalling: !!entity?.recalling,
+        recallProgress: clamp01(entity?.recallProgress || 0)
       }))
     };
   }
@@ -339,6 +341,7 @@
   function drawActors(frame) {
     if (!frame || !Array.isArray(frame.entities)) return;
     const drawnIds = new Set();
+    const now = performance.now();
     for (const actor of frame.entities) {
       if (actor.dead) continue;
       if (actor.team <= 0) continue;
@@ -376,6 +379,26 @@
       ctx.lineWidth = self ? 6 : 5;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
+
+      if (actor.recalling) {
+        const pulse = 0.5 + 0.5 * Math.sin(now / 160);
+        const ringRadius = radius + 8 + pulse * 3;
+        const progress = clamp01(actor.recallProgress);
+        const start = -Math.PI / 2;
+        const end = start + progress * Math.PI * 2;
+
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(120, 222, 255, 0.9)";
+        ctx.lineWidth = 4;
+        ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+        ctx.lineWidth = 3;
+        ctx.arc(x, y, ringRadius, start, end);
+        ctx.stroke();
+      }
     }
   }
 
