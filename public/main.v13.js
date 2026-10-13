@@ -26,6 +26,7 @@
   let pipBusy = false;
   let canvasScale = 1;
   const heroIconCache = new Map();
+  const ESP_ICON_SIZE = 42;
   const mapImage = new Image();
   let mapImageRetried = false;
   mapImage.onload = () => renderMap();
@@ -348,7 +349,7 @@
       const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
-      const radius = self ? 20 : 17;
+      const radius = self ? Math.round(ESP_ICON_SIZE * 0.55) : Math.round(ESP_ICON_SIZE * 0.5);
       const icon = getHeroIcon(actor.heroId);
       if (icon?.complete && icon.naturalWidth > 0) {
         ctx.save();
@@ -365,7 +366,7 @@
       }
       ctx.beginPath();
       ctx.strokeStyle = self ? "#8dff3a" : ally ? "rgba(79, 196, 255, 0.95)" : "rgba(255, 68, 94, 0.98)";
-      ctx.lineWidth = self ? 3.5 : 2.5;
+      ctx.lineWidth = self ? 4 : 3;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
     }
