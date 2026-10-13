@@ -12,9 +12,12 @@
     <link rel="stylesheet" href="/style.__ASSET_VERSION__.css" />
   </head>
   <body>
-    <main>
+    <main class="app-shell">
       <header class="page-head">
-        <a href="/webmap/" class="brand">✦ VTHANGIOS <span>LIVE MINIMAP</span></a>
+        <div class="brand-wrap">
+          <a href="/webmap/" class="brand">VTHANGIOS</a>
+          <p class="brand-sub">Arena of Valor · Live Tactical Minimap</p>
+        </div>
         <div class="tools">
           <button id="compact" class="btn-icon">
             <i class="bi bi-arrows-collapse"></i>
@@ -28,6 +31,10 @@
       </header>
 
       <section class="join">
+        <div class="join-head">
+          <h2>Kết nối trận đấu</h2>
+          <p>Nhập mã 6 ký tự lấy từ game để theo dõi minimap realtime.</p>
+        </div>
         <form id="joinForm">
           <label for="code">Mã phòng</label>
           <input id="code" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}" placeholder="6 ký tự" autocomplete="off" autocapitalize="characters" required />
@@ -40,7 +47,7 @@
             <span class="btn-text">Đổi mã</span>
           </button>
         </form>
-        <p id="pair">Tạo mã trong game, nhập mã ở đây để xem minimap trực tiếp (không hiển thị icon).</p>
+        <p id="pair">Hiển thị minimap gốc từ game, tối ưu mượt và không render icon chồng lên bản đồ.</p>
       </section>
 
       <p id="android-pip-help" class="pip-help" hidden>Android: mở bằng Chrome, chọn Cửa sổ nổi / PiP rồi chuyển sang game. Nếu bị chặn, bật quyền Hình trong hình cho Chrome.</p>
@@ -48,7 +55,8 @@
       <div class="battle-layout">
         <section class="map-panel" id="map-panel">
           <div class="map-toolbar">
-            <div>
+            <div class="map-title">
+              <span class="live-pill">LIVE</span>
               <h1>Bản đồ trực tiếp</h1>
               <p id="perspective">Chờ luồng từ iPhone</p>
             </div>
