@@ -340,10 +340,6 @@ dd {
   letter-spacing: 0.08em;
 }
 
-#latency {
-  color: var(--ok);
-}
-
 .share-caption {
   margin: 11px 0 6px;
   color: var(--muted);
