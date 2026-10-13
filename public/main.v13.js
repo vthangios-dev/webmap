@@ -376,21 +376,38 @@
         ctx.fill();
       }
       ctx.beginPath();
-      const hpColor = hpRate > 0.65
-        ? "rgba(80, 235, 126, 0.98)"
-        : hpRate > 0.35
-          ? "rgba(255, 211, 92, 0.98)"
-          : "rgba(255, 82, 96, 0.99)";
-      ctx.strokeStyle = hpColor;
+      const teamRingColor = self
+        ? "rgba(125, 255, 59, 0.98)"
+        : ally
+          ? "rgba(86, 204, 255, 0.98)"
+          : "rgba(255, 73, 101, 0.99)";
+      ctx.strokeStyle = teamRingColor;
       ctx.lineWidth = self ? 6 : 5;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
 
-      if (self) {
+      const hpArcStart = Math.PI * 0.2;
+      const hpArcEnd = Math.PI * 0.8;
+      const hpArcSpan = hpArcEnd - hpArcStart;
+      const hpLineWidth = self ? 5 : 4;
+      const hpRadius = radius + (self ? 4 : 3);
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(20, 26, 40, 0.86)";
+      ctx.lineWidth = hpLineWidth;
+      ctx.lineCap = "round";
+      ctx.arc(x, y, hpRadius, hpArcStart, hpArcEnd);
+      ctx.stroke();
+      if (hpRate > 0.01) {
+        const hpColor = hpRate > 0.65
+          ? "rgba(83, 237, 128, 0.99)"
+          : hpRate > 0.35
+            ? "rgba(255, 210, 92, 0.99)"
+            : "rgba(255, 72, 98, 1)";
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(141, 255, 58, 0.95)";
-        ctx.lineWidth = 2;
-        ctx.arc(x, y, radius + 8, 0, Math.PI * 2);
+        ctx.strokeStyle = hpColor;
+        ctx.lineWidth = hpLineWidth;
+        ctx.lineCap = "round";
+        ctx.arc(x, y, hpRadius, hpArcStart, hpArcStart + hpArcSpan * hpRate);
         ctx.stroke();
       }
 
