@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const latestByMatch = new Map();
 const socketsByMatch = new Map();
+const sequenceByMatch = new Map();
 
 function nowMs() {
   return Date.now();
@@ -95,6 +96,9 @@ function broadcast(matchId, data) {
   const wire = JSON.stringify(data);
   for (const ws of clients) {
     if (ws.readyState === ws.OPEN) {
+      if (ws.bufferedAmount > 1_000_000) {
+        continue;
+      }
       ws.send(wire);
     }
   }
@@ -127,9 +131,12 @@ app.post("/api/ingest/:matchId", (req, res) => {
   }
 
   const payload = sanitizePayload(req.body);
+  const nextSeq = (sequenceByMatch.get(matchId) || 0) + 1;
+  sequenceByMatch.set(matchId, nextSeq);
   const snapshot = {
     type: "snapshot",
     matchId,
+    seq: nextSeq,
     updatedAt: nowMs(),
     payload
   };

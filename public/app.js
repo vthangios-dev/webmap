@@ -20,9 +20,11 @@
     retry: 0,
     room: "",
     lastReceived: 0,
+    lastSeq: 0,
     frame: null,
     mapFrameKey: "",
-    mapFrameImage: null
+    mapFrameImage: null,
+    pendingMapFrame: null
   };
 
   let video = null;
@@ -30,6 +32,7 @@
   let pipBusy = false;
   let mapImageLoaded = false;
   let canvasScale = 1;
+  let mapFrameDecodeBusy = false;
 
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -49,18 +52,37 @@
     $("status").textContent = text;
   }
 
+  function consumePendingMapFrame() {
+    if (mapFrameDecodeBusy || !socketState.pendingMapFrame) return;
+    const task = socketState.pendingMapFrame;
+    socketState.pendingMapFrame = null;
+    mapFrameDecodeBusy = true;
+    const image = new Image();
+    image.onload = () => {
+      socketState.mapFrameImage = image;
+      socketState.mapFrameKey = task.key;
+      mapFrameDecodeBusy = false;
+      renderMap();
+      consumePendingMapFrame();
+    };
+    image.onerror = () => {
+      mapFrameDecodeBusy = false;
+      consumePendingMapFrame();
+    };
+    image.src = `data:${task.mime};base64,${task.data}`;
+  }
+
   function updateMapFrame(frame) {
     const mf = frame?.mapFrame;
     if (!mf || !mf.data) return;
     const key = `${mf.ts || 0}:${mf.data.length}`;
     if (key === socketState.mapFrameKey) return;
-    socketState.mapFrameKey = key;
-    const image = new Image();
-    image.onload = () => {
-      socketState.mapFrameImage = image;
-      renderMap();
+    socketState.pendingMapFrame = {
+      key,
+      mime: mf.mime || "image/jpeg",
+      data: mf.data
     };
-    image.src = `data:${mf.mime || "image/jpeg"};base64,${mf.data}`;
+    consumePendingMapFrame();
   }
 
   function setButtonText(id, text) {
@@ -122,8 +144,11 @@
 
   function resetFrame() {
     socketState.frame = null;
+    socketState.lastSeq = 0;
     socketState.mapFrameKey = "";
     socketState.mapFrameImage = null;
+    socketState.pendingMapFrame = null;
+    mapFrameDecodeBusy = false;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
     $("latency").textContent = "RTT —";
@@ -216,6 +241,9 @@
         try {
           const payload = JSON.parse(event.data);
           if (payload.type === "snapshot" && payload.matchId === room) {
+            const seq = Number(payload.seq || 0);
+            if (seq > 0 && seq <= socketState.lastSeq) return;
+            if (seq > 0) socketState.lastSeq = seq;
             const parsed = parsePayload(payload);
             if (!parsed) return;
             socketState.frame = parsed;
