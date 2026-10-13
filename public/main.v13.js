@@ -30,7 +30,7 @@
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
   const heroIconCache = new Map();
-  const LIVE_ENEMY_ICON_RADIUS = 20;
+  const LIVE_ENEMY_ICON_RADIUS = 28;
 
   function clamp01(value) {
     const n = Number(value);
@@ -411,6 +411,7 @@
       if (actor.dead) continue;
       if (!enemyOnly && !actor.visible) continue;
       if (enemyOnly && (actor.isSelf || (frame.camp > 0 && actor.team === frame.camp))) continue;
+      if (enemyOnly && actor.visible) continue;
       if (enemyOnly) {
         const dedupeKey = actor.id || `${actor.heroId}:${actor.team}:${actor.x}:${actor.y}`;
         if (drawnEnemyIds.has(dedupeKey)) continue;
@@ -434,12 +435,12 @@
         } else {
           ctx.beginPath();
           ctx.fillStyle = "#ff445e";
-          ctx.arc(x, y, radius - 3, 0, Math.PI * 2);
+          ctx.arc(x, y, radius - 8, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.beginPath();
         ctx.strokeStyle = "rgba(255, 64, 92, 0.98)";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
         ctx.stroke();
         continue;
