@@ -29,13 +29,6 @@
   let pipBusy = false;
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
-  const terrainImage = new Image();
-  let terrainReady = false;
-  terrainImage.onload = () => {
-    terrainReady = true;
-    renderMap();
-  };
-  terrainImage.src = "/assets/icons/terrain.png";
 
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -355,13 +348,6 @@
 
     ctx.fillStyle = "#0b1220";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-    if (terrainReady) {
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.drawImage(terrainImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-      ctx.restore();
-      return;
-    }
     const cell = 44;
     ctx.strokeStyle = "rgba(166, 194, 232, 0.16)";
     ctx.lineWidth = 1;

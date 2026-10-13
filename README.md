@@ -83,11 +83,11 @@ Viewer link production:
 
 Project đang dùng chế độ **manual filename** cho asset:
 
-- CSS: `/style.v12.css`
-- JS: `/main.v12.js`
+- CSS: `/style.v13.css`
+- JS: `/main.v13.js`
 
 Khi sửa frontend và muốn chắc chắn trình duyệt không dùng cache cũ:
 
-1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.v13.css`, `main.v13.js`)
+1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.v14.css`, `main.v14.js`)
 2. Sửa lại 2 đường dẫn tương ứng trong `public/index.html`
 3. Restart server
