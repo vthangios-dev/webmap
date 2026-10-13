@@ -381,6 +381,7 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
+    if (socketState.mapFrameImage) return;
     for (const actor of frame.actors) {
       drawActor(actor, frame.camp);
     }
