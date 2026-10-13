@@ -8,6 +8,7 @@ dotenv.config();
 
 const PORT = Number(process.env.PORT || 3016);
 const MAP_INGEST_TOKEN = process.env.MAP_INGEST_TOKEN || "";
+const INGEST_AUTH_ENABLED = MAP_INGEST_TOKEN.trim().length > 0;
 
 const app = express();
 app.use(express.json({ limit: "256kb" }));
@@ -79,7 +80,7 @@ function broadcast(matchId, data) {
 }
 
 function isAuthorized(req) {
-  if (!MAP_INGEST_TOKEN) return true;
+  if (!INGEST_AUTH_ENABLED) return true;
   const token = req.header("x-map-token") || "";
   return token === MAP_INGEST_TOKEN;
 }
@@ -181,4 +182,9 @@ wss.on("connection", (ws, req) => {
 
 server.listen(PORT, () => {
   console.log(`Webmap server listening on :${PORT}`);
+  console.log(
+    INGEST_AUTH_ENABLED
+      ? "Ingest auth: ON (x-map-token required)"
+      : "Ingest auth: OFF (no token required)"
+  );
 });
