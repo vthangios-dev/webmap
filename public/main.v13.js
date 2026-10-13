@@ -169,8 +169,6 @@
     const inferredCamp = Number(selfEntity?.team || 0);
     return {
       camp: metaCamp > 0 ? metaCamp : inferredCamp,
-      mapScale: Math.max(0.35, Math.min(3, Number(msg?.payload?.meta?.minimapScale || 1))),
-      unzoomFactor: Math.max(0.25, Math.min(4, Number(msg?.payload?.meta?.minimapUnzoomFactor || 1))),
       actorCount: entities.length,
       entities: entities.map((entity) => ({
         id: String(entity?.id || ""),
@@ -346,19 +344,14 @@
     if (!frame || !Array.isArray(frame.entities)) return;
     const drawnIds = new Set();
     const now = performance.now();
-    const unzoomFactor = Number.isFinite(frame.unzoomFactor) && frame.unzoomFactor > 0.001
-      ? frame.unzoomFactor
-      : (Number.isFinite(frame.mapScale) && frame.mapScale > 0.001 ? (1 / frame.mapScale) : 1);
     for (const actor of frame.entities) {
       if (actor.dead) continue;
       if (actor.team <= 0) continue;
       const dedupeKey = actor.id || `${actor.heroId}:${actor.team}:${actor.x}:${actor.y}`;
       if (drawnIds.has(dedupeKey)) continue;
       drawnIds.add(dedupeKey);
-      const correctedX = ((clamp01(actor.x) - 0.5) * unzoomFactor) + 0.5;
-      const correctedY = ((clamp01(actor.y) - 0.5) * unzoomFactor) + 0.5;
-      const x = clamp01(correctedX) * LOGICAL_MAP_SIZE;
-      const y = (1 - clamp01(correctedY)) * LOGICAL_MAP_SIZE;
+      const x = clamp01(actor.x) * LOGICAL_MAP_SIZE;
+      const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
       const hpRate = clamp01(actor.hp / Math.max(1, actor.maxHp));
