@@ -124,7 +124,9 @@
   }
 
   function setPerspectiveText(text) {
-    $("perspective").textContent = text;
+    const perspective = $("perspective");
+    if (!perspective) return;
+    perspective.textContent = text;
   }
 
   function disconnect() {
