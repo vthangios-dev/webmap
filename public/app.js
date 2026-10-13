@@ -5,7 +5,6 @@
   const canvas = $("map");
   const ctx = canvas.getContext("2d");
   const LOGICAL_MAP_SIZE = 900;
-  const MAP_ASSET = "/assets/";
 
   const android = /Android/i.test(navigator.userAgent);
   const mobile =
@@ -13,7 +12,6 @@
     /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-  const icons = {};
   const socketState = {
     ws: null,
     retry: 0,
@@ -29,7 +27,6 @@
   let video = null;
   let pipTimer = 0;
   let pipBusy = false;
-  let mapImageLoaded = false;
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
 
@@ -321,7 +318,7 @@
   }
 
   function background() {
-    ctx.fillStyle = "#182734";
+    ctx.fillStyle = "#0b1220";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     if (socketState.mapFrameImage) {
       ctx.save();
@@ -331,8 +328,6 @@
       ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
       ctx.imageSmoothingEnabled = prevSmooth;
       ctx.restore();
-    } else if (mapImageLoaded) {
-      ctx.drawImage(icons.terrain, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     }
   }
 
@@ -452,17 +447,6 @@
     setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
     chooseRoom(room, false);
   }
-
-  icons.terrain = new Image();
-  icons.terrain.onload = () => {
-    mapImageLoaded = true;
-    renderMap();
-  };
-  icons.terrain.onerror = () => {
-    mapImageLoaded = false;
-    renderMap();
-  };
-  icons.terrain.src = MAP_ASSET + "icons/terrain.png";
 
   if (mobile) {
     setButtonText("popup", "Cửa sổ nổi");
