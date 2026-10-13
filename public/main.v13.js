@@ -26,7 +26,7 @@
   let pipBusy = false;
   let canvasScale = 1;
   const heroIconCache = new Map();
-  const ESP_ICON_SIZE = 62;
+  const ESP_ICON_SIZE = 63;
   const mapImage = new Image();
   let mapImageRetried = false;
   mapImage.onload = () => renderMap();
