@@ -376,26 +376,10 @@
         ctx.fill();
       }
       ctx.beginPath();
-      const teamRingColor = self
-        ? "rgba(125, 255, 59, 0.98)"
-        : ally
-          ? "rgba(86, 204, 255, 0.98)"
-          : "rgba(255, 73, 101, 0.99)";
-      ctx.strokeStyle = teamRingColor;
-      ctx.lineWidth = self ? 6 : 5;
-      ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
-      ctx.stroke();
-
-      const hpLineWidth = self ? 3 : 2.5;
-      const hpRadius = Math.max(4, radius - (self ? 3 : 2));
+      const hpLineWidth = self ? 5 : 4.5;
+      const hpRadius = radius + 1;
       const hpArcStart = -Math.PI / 2;
       const hpArcSpan = Math.PI * 2;
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(18, 22, 34, 0.72)";
-      ctx.lineWidth = hpLineWidth;
-      ctx.lineCap = "round";
-      ctx.arc(x, y, hpRadius, 0, Math.PI * 2);
-      ctx.stroke();
       if (hpRate > 0.01) {
         const hpColor = hpRate > 0.65
           ? "rgba(83, 237, 128, 0.99)"
