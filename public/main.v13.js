@@ -120,7 +120,7 @@
   }
 
   function waitingText() {
-    return "Chờ iPhone phát bản đồ";
+    return "Chờ luồng phát bản đồ";
   }
 
   function setPerspectiveText(text) {
@@ -151,7 +151,7 @@
     if (codeInput) codeInput.value = socketState.room;
     updateShare();
     resetFrame();
-    setPerspectiveText("Chờ luồng từ iPhone");
+    setPerspectiveText("Chờ luồng phát bản đồ");
     notice("");
     status(socketState.room ? "Đang kết nối..." : "Chưa kết nối");
     if (writeURL) syncURL();
@@ -229,7 +229,7 @@
       if (socketState.ws !== ws) return;
       socketState.ws = null;
       status("Luồng phát đã dừng / phòng chưa mở");
-      setPerspectiveText("Chờ luồng từ iPhone");
+      setPerspectiveText("Chờ luồng phát bản đồ");
       resetFrame();
       socketState.retry = setTimeout(() => {
         if (socketState.room === room && !socketState.ws) connect(room);
@@ -441,7 +441,7 @@
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
     if (!live) {
-      setMapMessage("Chờ iPhone phát bản đồ");
+      setMapMessage("Chờ luồng phát bản đồ");
     }
     $("age").textContent =
       socketState.lastReceived && age < 3000
