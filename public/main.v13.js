@@ -376,7 +376,7 @@
         ctx.fill();
       }
       ctx.beginPath();
-      const hpLineWidth = self ? 5 : 4.5;
+      const hpLineWidth = self ? 6 : 5.5;
       const hpRadius = radius + 1;
       const hpArcStart = -Math.PI / 2;
       const hpArcSpan = Math.PI * 2;
