@@ -270,10 +270,12 @@
     pipTimer = 0;
     const open = pipState();
     setButtonText("pip", open ? "Đóng PiP" : "PiP");
-    $("pip").setAttribute("aria-pressed", String(open));
+    const pipButton = $("pip");
+    if (pipButton) pipButton.setAttribute("aria-pressed", String(open));
     if (mobile) {
       setButtonText("popup", open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi");
-      $("popup").setAttribute("aria-pressed", String(open));
+      const popupButton = $("popup");
+      if (popupButton) popupButton.setAttribute("aria-pressed", String(open));
     }
     if (open) pipTimer = setInterval(renderMap, 16);
   }
@@ -286,8 +288,10 @@
       return;
     }
     pipBusy = true;
-    $("pip").disabled = true;
-    if (mobile) $("popup").disabled = true;
+    const pipButton = $("pip");
+    const popupButton = $("popup");
+    if (pipButton) pipButton.disabled = true;
+    if (mobile && popupButton) popupButton.disabled = true;
     try {
       const v = pipVideo();
       if (pipState()) {
@@ -312,8 +316,8 @@
       notice("Không mở được cửa sổ nổi PiP.");
     } finally {
       pipBusy = false;
-      $("pip").disabled = false;
-      if (mobile) $("popup").disabled = false;
+      if (pipButton) pipButton.disabled = false;
+      if (mobile && popupButton) popupButton.disabled = false;
       syncPipButton();
     }
   }
@@ -478,11 +482,14 @@
     resetRoomButton.onclick = () => chooseRoom("", true);
   }
 
-  $("compact").onclick = () => {
-    document.body.classList.toggle("compact");
-    setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
-    syncURL();
-  };
+  const compactButton = $("compact");
+  if (compactButton) {
+    compactButton.onclick = () => {
+      document.body.classList.toggle("compact");
+      setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
+      syncURL();
+    };
+  }
 
   const expandButton = $("expand");
   if (expandButton) {
@@ -493,41 +500,50 @@
     };
   }
 
-  $("popup").onclick = () => {
-    if (mobile) {
-      togglePip();
-      return;
-    }
-    notice("");
-    if (!socketState.room) {
-      notice("Vào phòng trước khi mở cửa sổ nhỏ");
-      return;
-    }
-    const url = `/${encodeURIComponent(socketState.room)}?compact=1`;
-    if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
-      notice("Trình duyệt đang chặn cửa sổ bật lên");
-    }
-  };
-
-  $("pip").onclick = togglePip;
-
-  $("fullscreen").onclick = async () => {
-    notice("");
-    try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
+  const popupButton = $("popup");
+  if (popupButton) {
+    popupButton.onclick = () => {
+      if (mobile) {
+        togglePip();
         return;
       }
-      if ($("map-panel").requestFullscreen) {
-        await $("map-panel").requestFullscreen();
-      } else {
-        document.body.classList.toggle("compact");
-        setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
+      notice("");
+      if (!socketState.room) {
+        notice("Vào phòng trước khi mở cửa sổ nhỏ");
+        return;
       }
-    } catch (_err) {
-      notice("Không mở được toàn màn hình");
-    }
-  };
+      const url = `/${encodeURIComponent(socketState.room)}?compact=1`;
+      if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
+        notice("Trình duyệt đang chặn cửa sổ bật lên");
+      }
+    };
+  }
+
+  const pipButton = $("pip");
+  if (pipButton) {
+    pipButton.onclick = togglePip;
+  }
+
+  const fullscreenButton = $("fullscreen");
+  if (fullscreenButton) {
+    fullscreenButton.onclick = async () => {
+      notice("");
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+          return;
+        }
+        if ($("map-panel").requestFullscreen) {
+          await $("map-panel").requestFullscreen();
+        } else {
+          document.body.classList.toggle("compact");
+          setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
+        }
+      } catch (_err) {
+        notice("Không mở được toàn màn hình");
+      }
+    };
+  }
 
   $("copy-link").onclick = async () => {
     const text = $("share-url").textContent || location.href;
@@ -577,7 +593,7 @@
     chooseRoom(room, false);
   }
 
-  if (mobile) {
+  if (mobile && $("popup")) {
     setButtonText("popup", "Cửa sổ nổi");
     $("popup").title = "Hiển thị bản đồ trên ứng dụng khác";
   }
