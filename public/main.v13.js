@@ -373,7 +373,7 @@
       }
       ctx.beginPath();
       ctx.strokeStyle = self ? "#8dff3a" : ally ? "rgba(79, 196, 255, 0.95)" : "rgba(255, 68, 94, 0.98)";
-      ctx.lineWidth = self ? 4.5 : 3.5;
+      ctx.lineWidth = self ? 6 : 5;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
     }
