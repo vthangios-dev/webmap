@@ -12,71 +12,71 @@
     <link rel="stylesheet" href="/style.__ASSET_VERSION__.css" />
   </head>
   <body>
-    <main class="layout">
-      <header class="topbar">
-        <div class="brand-area">
-          <a href="/webmap/" class="brand">VTHANGIOS</a>
-          <p class="brand-sub">LIVE TACTICAL MINIMAP</p>
+    <main class="shell">
+      <header class="masthead">
+        <div class="title-wrap">
+          <a href="/webmap/" class="brand">AOV RECON</a>
+          <p class="subtitle"><i class="bi bi-activity"></i> Realtime Tactical Stream</p>
         </div>
-        <div class="actions">
-          <button id="compact" class="btn">
-            <i class="bi bi-arrows-collapse"></i>
-            <span class="btn-text">Thu gọn</span>
+        <div class="head-actions">
+          <button id="compact" class="control-btn">
+            <i class="bi bi-layout-sidebar-inset"></i>
+            <span class="btn-text">Compact</span>
           </button>
-          <button id="popup" class="btn">
-            <i class="bi bi-window-stack"></i>
+          <button id="popup" class="control-btn emphasis">
+            <i class="bi bi-window"></i>
             <span class="btn-text">Cửa sổ nổi</span>
           </button>
         </div>
       </header>
 
-      <p id="android-pip-help" class="pip-help" hidden>
-        Android: dùng Chrome, bấm Cửa sổ nổi hoặc PiP rồi chuyển sang game.
+      <p id="android-pip-help" class="android-note" hidden>
+        <i class="bi bi-phone"></i> Android: bật PiP / cửa sổ nổi trong Chrome rồi chuyển sang game.
       </p>
 
-      <section class="dashboard">
-        <article class="viewer-card map-panel" id="map-panel">
-          <div class="viewer-head">
-            <div>
-              <span class="live-badge">LIVE</span>
-              <h1>Bản đồ trực tiếp</h1>
+      <section class="workspace">
+        <article id="map-panel" class="arena map-panel">
+          <div class="arena-top">
+            <div class="arena-meta">
+              <span class="status-live"><i class="bi bi-broadcast-pin"></i> LIVE TRACK</span>
+              <h1>Realtime Map Feed</h1>
               <p id="perspective">Chờ luồng từ iPhone</p>
             </div>
-            <div class="viewer-tools">
-              <button id="expand" class="btn expand" title="Mở rộng">
+            <div class="arena-actions">
+              <button id="expand" class="control-btn expand" title="Mở rộng">
                 <i class="bi bi-arrows-angle-expand"></i>
-                <span class="btn-text">Mở rộng</span>
+                <span class="btn-text">Expand</span>
               </button>
-              <button id="pip" class="btn" title="Nổi trên ứng dụng">
+              <button id="pip" class="control-btn" title="Nổi trên ứng dụng">
                 <i class="bi bi-pip"></i>
                 <span class="btn-text">PiP</span>
               </button>
-              <button id="fullscreen" class="btn" title="Toàn màn hình">
-                <i class="bi bi-fullscreen"></i>
-                <span class="btn-text">Toàn màn hình</span>
+              <button id="fullscreen" class="control-btn" title="Toàn màn hình">
+                <i class="bi bi-bounding-box-circles"></i>
+                <span class="btn-text">Fullscreen</span>
               </button>
             </div>
           </div>
 
-          <p id="notice" class="map-notice" role="status" hidden></p>
+          <p id="notice" class="warning-bar" role="status" hidden></p>
 
-          <div class="map-stage">
+          <div class="frame">
             <canvas id="map" width="900" height="900"></canvas>
             <div class="map-message" id="map-message">Mở link phòng để xem bản đồ</div>
           </div>
         </article>
 
-        <aside class="session-card">
-          <h2>Thông tin phiên</h2>
+        <aside class="intel-card">
+          <h2><i class="bi bi-grid-3x3-gap-fill"></i> Session Intel</h2>
           <dl>
-            <div><dt>Mã phòng</dt><dd id="room">—</dd></div>
-            <div><dt>Trạng thái</dt><dd id="status">Chưa kết nối</dd></div>
-            <div><dt>Kết nối web</dt><dd id="latency">RTT —</dd></div>
-            <div><dt>Bản đồ</dt><dd id="age">Chưa có dữ liệu</dd></div>
+            <div><dt><i class="bi bi-key-fill"></i> Mã phòng</dt><dd id="room">—</dd></div>
+            <div><dt><i class="bi bi-plug-fill"></i> Trạng thái</dt><dd id="status">Chưa kết nối</dd></div>
+            <div><dt><i class="bi bi-lightning-charge-fill"></i> Kết nối web</dt><dd id="latency">RTT —</dd></div>
+            <div><dt><i class="bi bi-clock-history"></i> Bản đồ</dt><dd id="age">Chưa có dữ liệu</dd></div>
           </dl>
-          <p class="share-label">Link share</p>
+          <p class="share-caption">Link chia sẻ</p>
           <code id="share-url">—</code>
-          <button id="copy-link" class="btn copy-btn">
+          <button id="copy-link" class="control-btn copy">
             <i class="bi bi-copy"></i>
             <span class="btn-text">Copy Link</span>
           </button>
