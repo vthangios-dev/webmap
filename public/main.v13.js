@@ -395,20 +395,20 @@
       }
 
       if (actor.recalling) {
-        const pulse = 0.5 + 0.5 * Math.sin(now / 160);
-        const ringRadius = radius + 8 + pulse * 3;
+        const spin = (now / 480) % (Math.PI * 2);
+        const ringRadius = radius + 8;
         const progress = clamp01(actor.recallProgress);
-        const start = -Math.PI / 2;
+        const start = spin - Math.PI / 2;
         const end = start + progress * Math.PI * 2;
 
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(120, 222, 255, 0.9)";
-        ctx.lineWidth = 4;
-        ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(40, 220, 255, 0.92)";
+        ctx.lineWidth = 3.5;
+        ctx.arc(x, y, ringRadius, spin, spin + Math.PI * 1.2);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.98)";
         ctx.lineWidth = 3;
         ctx.arc(x, y, ringRadius, start, end);
         ctx.stroke();
