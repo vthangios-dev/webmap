@@ -33,7 +33,7 @@ const ctx = canvas.getContext("2d");
 
 const MAP_IMAGE_URL =
   qs.get("mapImg") ||
-  "https://ios.solstice.wtf/webmap/assets/icons/terrain.png";
+  "/assets/icons/terrain.png";
 
 const mapImage = new Image();
 mapImage.crossOrigin = "anonymous";

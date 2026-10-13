@@ -5,7 +5,7 @@ Thư mục này là webmap tách riêng để deploy lên SSH.
 ## 1) Cài đặt
 
 ```bash
-cd webmap-map.vthangios.xyz
+cd webmap
 cp .env.example .env
 npm install
 ```
@@ -17,7 +17,7 @@ npm run dev
 ```
 
 - Health check: `http://localhost:3000/health`
-- Viewer URL: `http://localhost:3000/webmap/test-match`
+- Viewer URL: `http://localhost:3000/`
 - Hoặc vào `http://localhost:3000/webmap` rồi nhập **mã map** trên giao diện (mã này tạo từ menu app)
 
 ## 3) API ingest realtime
@@ -54,7 +54,7 @@ curl -X POST "http://localhost:3000/api/ingest/test-match" \
 ```
 
 
-## 4) Deploy SSH + domain `map.vthangios.xyz`
+## 4) Deploy SSH + domain `https://map.vthangios.xyz/`
 
 Khuyến nghị dùng reverse proxy (Nginx/Caddy) trỏ về app Node:
 
@@ -64,4 +64,6 @@ Khuyến nghị dùng reverse proxy (Nginx/Caddy) trỏ về app Node:
 
 Viewer link production:
 
+- `https://map.vthangios.xyz/`
+- `https://map.vthangios.xyz/webmap`
 - `https://map.vthangios.xyz/webmap/<matchId>`
