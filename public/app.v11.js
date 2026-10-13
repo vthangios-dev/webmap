@@ -18,17 +18,13 @@
     room: "",
     lastReceived: 0,
     lastSeq: 0,
-    frame: null,
-    mapFrameKey: "",
-    mapFrameImage: null,
-    pendingMapFrame: null
+    frame: null
   };
 
   let video = null;
   let pipTimer = 0;
   let pipBusy = false;
   let canvasScale = 1;
-  let mapFrameDecodeBusy = false;
 
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -46,39 +42,6 @@
 
   function status(text) {
     $("status").textContent = text;
-  }
-
-  function consumePendingMapFrame() {
-    if (mapFrameDecodeBusy || !socketState.pendingMapFrame) return;
-    const task = socketState.pendingMapFrame;
-    socketState.pendingMapFrame = null;
-    mapFrameDecodeBusy = true;
-    const image = new Image();
-    image.onload = () => {
-      socketState.mapFrameImage = image;
-      socketState.mapFrameKey = task.key;
-      mapFrameDecodeBusy = false;
-      renderMap();
-      consumePendingMapFrame();
-    };
-    image.onerror = () => {
-      mapFrameDecodeBusy = false;
-      consumePendingMapFrame();
-    };
-    image.src = `data:${task.mime};base64,${task.data}`;
-  }
-
-  function updateMapFrame(frame) {
-    const mf = frame?.mapFrame;
-    if (!mf || !mf.data) return;
-    const key = `${mf.ts || 0}:${mf.data.length}`;
-    if (key === socketState.mapFrameKey) return;
-    socketState.pendingMapFrame = {
-      key,
-      mime: mf.mime || "image/jpeg",
-      data: mf.data
-    };
-    consumePendingMapFrame();
   }
 
   function setButtonText(id, text) {
@@ -141,10 +104,6 @@
   function resetFrame() {
     socketState.frame = null;
     socketState.lastSeq = 0;
-    socketState.mapFrameKey = "";
-    socketState.mapFrameImage = null;
-    socketState.pendingMapFrame = null;
-    mapFrameDecodeBusy = false;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
     $("latency").textContent = "— ms";
@@ -173,13 +132,17 @@
     return {
       camp: Number(msg?.payload?.meta?.selfTeam || 0),
       actorCount: entities.length,
-      mapFrame: msg?.payload?.mapFrame && typeof msg.payload.mapFrame === "object"
-        ? {
-            mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
-            data: String(msg.payload.mapFrame.data || ""),
-            ts: Number(msg.payload.mapFrame.ts || 0)
-          }
-        : null
+      entities: entities.map((entity) => ({
+        id: Number(entity?.id || 0),
+        team: Number(entity?.team || 0),
+        x: Number(entity?.x || 0),
+        y: Number(entity?.y || 0),
+        hp: Number(entity?.hp || 0),
+        maxHp: Number(entity?.maxHp || 1),
+        dead: !!entity?.dead,
+        visible: entity?.visible !== false,
+        isSelf: !!entity?.isSelf
+      }))
     };
   }
 
@@ -208,13 +171,12 @@
             if (!parsed) return;
             socketState.frame = parsed;
             socketState.lastReceived = performance.now();
-            updateMapFrame(parsed);
             const count = parsed.actorCount;
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
             setPerspectiveText(
               parsed.camp
-                ? `Góc nhìn Team ${parsed.camp} • Không hiển thị icon`
-                : "Đang nhận minimap trực tiếp"
+                ? `Góc nhìn Team ${parsed.camp} • Minimap render từ dữ liệu`
+                : "Minimap render từ dữ liệu realtime"
             );
             $("age").textContent = "Cập nhật vài giây trước";
             renderMap();
@@ -318,22 +280,65 @@
     }
   }
 
-  function background(showLiveFrame) {
-    if (showLiveFrame && socketState.mapFrameImage) {
-      ctx.fillStyle = "#0b1220";
-      ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-      ctx.save();
-      const prevSmooth = ctx.imageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = false;
-      ctx.filter = "contrast(1.22) saturate(1.16) brightness(1.08)";
-      ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-      ctx.imageSmoothingEnabled = prevSmooth;
-      ctx.restore();
-      return;
+  function background() {
+    const size = LOGICAL_MAP_SIZE;
+    ctx.fillStyle = "#101a2d";
+    ctx.fillRect(0, 0, size, size);
+
+    const cell = 44;
+    ctx.strokeStyle = "rgba(166, 194, 232, 0.16)";
+    ctx.lineWidth = 1;
+    for (let p = 0; p <= size; p += cell) {
+      ctx.beginPath();
+      ctx.moveTo(p, 0);
+      ctx.lineTo(p, size);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, p);
+      ctx.lineTo(size, p);
+      ctx.stroke();
     }
 
-    ctx.fillStyle = "#0b1220";
-    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+    const grad = ctx.createRadialGradient(size * 0.78, size * 0.18, size * 0.06, size * 0.78, size * 0.18, size * 0.72);
+    grad.addColorStop(0, "rgba(128, 188, 255, 0.24)");
+    grad.addColorStop(1, "rgba(128, 188, 255, 0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  function drawActors(frame) {
+    if (!frame || !Array.isArray(frame.entities)) return;
+    for (const actor of frame.entities) {
+      if (!actor.visible || actor.dead) continue;
+      const x = Math.max(0, Math.min(1, actor.x)) * LOGICAL_MAP_SIZE;
+      const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
+      const ally = actor.team === frame.camp;
+      const self = actor.isSelf;
+      const radius = self ? 11 : 8;
+
+      ctx.beginPath();
+      ctx.fillStyle = self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82";
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(9, 14, 24, 0.85)";
+      ctx.lineWidth = 2;
+      ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
+      ctx.stroke();
+
+      if (actor.maxHp > 0) {
+        const hpRate = Math.max(0, Math.min(1, actor.hp / actor.maxHp));
+        const barW = self ? 24 : 18;
+        const barH = 3;
+        const barX = x - barW / 2;
+        const barY = y - (radius + 9);
+        ctx.fillStyle = "rgba(8, 12, 20, 0.7)";
+        ctx.fillRect(barX, barY, barW, barH);
+        ctx.fillStyle = hpRate > 0.5 ? "#58e3aa" : hpRate > 0.2 ? "#ffcf66" : "#ff6e82";
+        ctx.fillRect(barX, barY, barW * hpRate, barH);
+      }
+    }
   }
 
   function setMapMessage(text) {
@@ -357,7 +362,7 @@
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
     setLiveBadge(live);
-    background(live);
+    background();
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
     if (!live) {
@@ -371,6 +376,7 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
+    drawActors(frame);
     return;
   }
 

@@ -43,19 +43,7 @@ Body mẫu:
 }
 ```
 
-`mapFrame` (tuỳ chọn) để stream minimap thật từ game:
-
-```json
-{
-  "mapFrame": {
-    "mime": "image/jpeg",
-    "data": "<base64>",
-    "w": 320,
-    "h": 320,
-    "ts": 1728838800456
-  }
-}
-```
+Webmap hiện render minimap **thuần từ dữ liệu tọa độ** (`entities`) + `meta.selfTeam`, không cần stream ảnh minimap/crop từ thiết bị.
 
 Test nhanh:
 
@@ -83,11 +71,11 @@ Viewer link production:
 
 Project đang dùng chế độ **manual filename** cho asset:
 
-- CSS: `/style.webmap-r3.css`
-- JS: `/app.webmap-r3.js`
+- CSS: `/style.v11.css`
+- JS: `/app.v11.js`
 
 Khi sửa frontend và muốn chắc chắn trình duyệt không dùng cache cũ:
 
-1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.webmap-r3.css`, `app.webmap-r3.js`)
+1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.v12.css`, `app.v12.js`)
 2. Sửa lại 2 đường dẫn tương ứng trong `public/index.html`
 3. Restart server

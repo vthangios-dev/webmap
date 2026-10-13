@@ -274,9 +274,9 @@ canvas {
 }
 
 .map-panel.is-waiting #map-message {
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.06;
   color: #eff6ff;
   text-shadow:
@@ -425,7 +425,7 @@ body.compact .frame {
 }
 
 body.compact .map-panel.is-waiting #map-message {
-  font-size: 20px;
+  font-size: 14px;
 }
 
 body.compact .expand {
