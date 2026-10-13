@@ -342,7 +342,7 @@
     const live = !!frame && age < 3000;
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
-    if (!socketState.room) $("map-message").textContent = "Nhập mã phòng để xem bản đồ";
+    if (!socketState.room) $("map-message").textContent = "Mở link phòng để xem bản đồ";
     else if (!live) $("map-message").textContent = "Chờ dữ liệu từ iPhone";
     $("age").textContent =
       socketState.lastReceived && age < 3000
