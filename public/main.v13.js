@@ -376,8 +376,8 @@
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     ctx.save();
     const prevSmooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = true;
-    ctx.filter = "contrast(1.1) saturate(1.08) brightness(1.04)";
+    ctx.imageSmoothingEnabled = false;
+    ctx.filter = "none";
     ctx.drawImage(image, 0, 0, srcW, srcH, dx, dy, drawW, drawH);
     ctx.imageSmoothingEnabled = prevSmooth;
     ctx.restore();
