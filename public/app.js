@@ -335,8 +335,11 @@
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     if (socketState.mapFrameImage) {
       ctx.save();
-      ctx.filter = "contrast(1.16) saturate(1.12) brightness(1.06)";
+      const prevSmooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.filter = "contrast(1.22) saturate(1.16) brightness(1.08)";
       ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+      ctx.imageSmoothingEnabled = prevSmooth;
       ctx.restore();
     } else if (mapImageLoaded) {
       ctx.drawImage(icons.terrain, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
