@@ -273,7 +273,6 @@
     const pipButton = $("pip");
     if (pipButton) pipButton.setAttribute("aria-pressed", String(open));
     if (mobile) {
-      setButtonText("popup", open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi");
       const popupButton = $("popup");
       if (popupButton) popupButton.setAttribute("aria-pressed", String(open));
     }
@@ -503,10 +502,6 @@
   const popupButton = $("popup");
   if (popupButton) {
     popupButton.onclick = () => {
-      if (mobile) {
-        togglePip();
-        return;
-      }
       notice("");
       if (!socketState.room) {
         notice("Vào phòng trước khi mở cửa sổ nhỏ");
@@ -594,7 +589,6 @@
   }
 
   if (mobile && $("popup")) {
-    setButtonText("popup", "Cửa sổ nổi");
     $("popup").title = "Hiển thị bản đồ trên ứng dụng khác";
   }
   if (android && $("android-pip-help")) {
