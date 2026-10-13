@@ -37,8 +37,8 @@ Body mẫu:
     "selfTeam": 1
   },
   "entities": [
-    { "id": "self", "name": "Me", "team": 1, "x": 0.22, "y": 0.44, "hp": 9450, "maxHp": 9450, "dead": false, "visible": true },
-    { "id": "enemy-1", "name": "Enemy A", "team": 2, "x": 0.61, "y": 0.52, "hp": 5100, "maxHp": 7000, "dead": false, "visible": true }
+    { "id": "self", "name": "Me", "heroId": 190, "team": 1, "x": 0.22, "y": 0.44, "hp": 9450, "maxHp": 9450, "dead": false, "visible": true, "isSelf": true },
+    { "id": "enemy-1", "name": "Enemy A", "heroId": 131, "team": 2, "x": 0.61, "y": 0.52, "hp": 5100, "maxHp": 7000, "dead": false, "visible": true, "isSelf": false }
   ]
 }
 ```

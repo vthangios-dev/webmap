@@ -37,14 +37,17 @@ function clamp01(n) {
 }
 
 function sanitizeEntity(entity) {
+  const heroId = Math.max(0, safeNumber(entity.heroId, 0));
   return {
     id: String(entity.id || ""),
     name: String(entity.name || ""),
     type: String(entity.type || "hero"),
+    heroId,
     team: safeNumber(entity.team, 0),
     x: clamp01(entity.x),
     y: clamp01(entity.y),
     dead: Boolean(entity.dead),
+    isSelf: Boolean(entity.isSelf),
     visible: entity.visible === undefined ? true : Boolean(entity.visible),
     hp: Math.max(0, safeNumber(entity.hp, 0)),
     maxHp: Math.max(1, safeNumber(entity.maxHp, 1))
