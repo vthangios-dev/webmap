@@ -366,17 +366,19 @@
     const srcH = image.naturalHeight || image.height || 0;
     if (srcW < 2 || srcH < 2) return false;
 
-    const side = Math.min(srcW, srcH);
-    const sx = Math.max(0, Math.floor((srcW - side) * 0.5));
-    const sy = Math.max(0, Math.floor((srcH - side) * 0.5));
+    const scale = Math.min(LOGICAL_MAP_SIZE / srcW, LOGICAL_MAP_SIZE / srcH);
+    const drawW = Math.max(1, Math.round(srcW * scale));
+    const drawH = Math.max(1, Math.round(srcH * scale));
+    const dx = Math.floor((LOGICAL_MAP_SIZE - drawW) * 0.5);
+    const dy = Math.floor((LOGICAL_MAP_SIZE - drawH) * 0.5);
 
     ctx.fillStyle = "#0b1220";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     ctx.save();
     const prevSmooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
-    ctx.filter = "contrast(1.22) saturate(1.16) brightness(1.08)";
-    ctx.drawImage(image, sx, sy, side, side, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+    ctx.imageSmoothingEnabled = true;
+    ctx.filter = "contrast(1.1) saturate(1.08) brightness(1.04)";
+    ctx.drawImage(image, 0, 0, srcW, srcH, dx, dy, drawW, drawH);
     ctx.imageSmoothingEnabled = prevSmooth;
     ctx.restore();
     return true;
