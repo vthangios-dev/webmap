@@ -382,10 +382,10 @@
       const hpArcSpan = Math.PI * 2;
       if (hpRate > 0.01) {
         const hpColor = hpRate > 0.65
-          ? "rgba(83, 237, 128, 0.99)"
+          ? "rgba(95, 228, 124, 0.98)"
           : hpRate > 0.35
-            ? "rgba(255, 210, 92, 0.99)"
-            : "rgba(255, 72, 98, 1)";
+            ? "rgba(242, 190, 74, 0.99)"
+            : "rgba(238, 74, 92, 1)";
         ctx.beginPath();
         ctx.strokeStyle = hpColor;
         ctx.lineWidth = hpLineWidth;
@@ -402,7 +402,7 @@
         const end = start + progress * Math.PI * 2;
 
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(40, 220, 255, 0.92)";
+        ctx.strokeStyle = "rgba(72, 206, 255, 0.9)";
         ctx.lineWidth = 3.5;
         ctx.arc(x, y, ringRadius, spin, spin + Math.PI * 1.2);
         ctx.stroke();
