@@ -1,325 +1,429 @@
-const qs = new URLSearchParams(window.location.search);
-const fromPath = window.location.pathname.match(/\/webmap\/([^/]+)/);
-const defaultMatch = (fromPath?.[1] || "").trim();
+(() => {
+  "use strict";
 
-const joinForm = document.getElementById("joinForm");
-const mapCodeInput = document.getElementById("mapCodeInput");
-const joinMapBtn = document.getElementById("joinMapBtn");
-const resetBtn = document.getElementById("resetBtn");
-const compactBtn = document.getElementById("compactBtn");
-const popupBtn = document.getElementById("popupBtn");
-const fullscreenBtn = document.getElementById("fullscreenBtn");
-const perspective = document.getElementById("perspective");
+  const $ = (id) => document.getElementById(id);
+  const canvas = $("map");
+  const ctx = canvas.getContext("2d");
+  const MAP_ASSET = "/assets/";
 
-const wsDot = document.getElementById("wsDot");
-const wsStatus = document.getElementById("wsStatus");
-const roomValue = document.getElementById("roomValue");
-const updatedAt = document.getElementById("updatedAt");
-const countInfo = document.getElementById("countInfo");
-const shareUrl = document.getElementById("shareUrl");
-const copyLinkBtn = document.getElementById("copyLinkBtn");
-const emptyOverlay = document.getElementById("emptyOverlay");
+  const android = /Android/i.test(navigator.userAgent);
+  const mobile =
+    android ||
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-const floatingPanel = document.getElementById("floatingPanel");
-const floatingHeader = document.getElementById("floatingHeader");
-const floatingBody = document.getElementById("floatingBody");
-const floatMatch = document.getElementById("floatMatch");
-const floatStatus = document.getElementById("floatStatus");
-const floatCount = document.getElementById("floatCount");
-const toggleFloatingBtn = document.getElementById("toggleFloatingBtn");
-
-const canvas = document.getElementById("mapCanvas");
-const ctx = canvas.getContext("2d");
-
-const MAP_IMAGE_URL =
-  qs.get("mapImg") ||
-  "/assets/icons/terrain.png";
-
-const mapImage = new Image();
-mapImage.crossOrigin = "anonymous";
-let mapImageLoaded = false;
-mapImage.onload = () => {
-  mapImageLoaded = true;
-  render();
-};
-mapImage.onerror = () => {
-  mapImageLoaded = false;
-  render();
-};
-mapImage.src = MAP_IMAGE_URL;
-
-let ws = null;
-let snapshot = null;
-let currentMatchId = "";
-let shareLink = "";
-let wsStatusText = "Chưa kết nối";
-let reconnectTimer = null;
-
-function sanitizeCode(code) {
-  return String(code || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-}
-
-function setWsState(isOnline, text) {
-  wsStatusText = text;
-  wsDot.className = `dot ${isOnline ? "on" : "off"}`;
-  wsStatus.textContent = text;
-  floatStatus.textContent = `WS: ${text}`;
-  perspective.textContent = isOnline ? "Đang nhận dữ liệu trực tiếp" : "Chờ luồng từ iPhone";
-}
-
-function updateShare(matchId) {
-  shareLink = `${window.location.origin}/webmap/${encodeURIComponent(matchId)}`;
-  shareUrl.textContent = shareLink;
-  roomValue.textContent = matchId || "—";
-  floatMatch.textContent = `Mã map: ${matchId || "-"}`;
-}
-
-function resetSnapshotUI() {
-  snapshot = null;
-  updatedAt.textContent = "Chưa có dữ liệu";
-  countInfo.textContent = "0";
-  floatCount.textContent = "Đối tượng: 0";
-  render();
-}
-
-function toCanvas(x01, y01) {
-  return {
-    x: x01 * canvas.width,
-    y: (1 - y01) * canvas.height
-  };
-}
-
-function drawBackground() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (mapImageLoaded) {
-    ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgba(6,12,20,0.38)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    return;
-  }
-
-  ctx.fillStyle = "#0f1a30";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = "rgba(255,255,255,0.06)";
-  for (let x = 0; x <= canvas.width; x += 60) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.height);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= canvas.height; y += 60) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-  }
-}
-
-function drawEntity(entity, selfTeam) {
-  const p = toCanvas(entity.x, entity.y);
-  const isAlly = selfTeam && entity.team === selfTeam;
-  const isEnemy = selfTeam && entity.team !== selfTeam;
-  const color = isAlly ? "#4ab4ff" : (isEnemy ? "#ff6a92" : "#f2c76f");
-
-  ctx.globalAlpha = entity.dead ? 0.35 : 1;
-  ctx.beginPath();
-  ctx.fillStyle = color;
-  ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.strokeStyle = "rgba(255,255,255,0.88)";
-  ctx.lineWidth = 2;
-  ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
-  ctx.stroke();
-
-  const hpRate = Math.max(0, Math.min(1, entity.hp / Math.max(1, entity.maxHp)));
-  const barW = 30;
-  const barX = p.x - barW / 2;
-  const barY = p.y - 20;
-  ctx.fillStyle = "rgba(20,20,30,0.85)";
-  ctx.fillRect(barX, barY, barW, 4);
-  ctx.fillStyle = hpRate > 0.45 ? "#4be28e" : hpRate > 0.2 ? "#ffd35c" : "#ff6262";
-  ctx.fillRect(barX, barY, barW * hpRate, 4);
-
-  if (entity.name) {
-    ctx.font = "11px sans-serif";
-    ctx.fillStyle = "#eef3ff";
-    ctx.fillText(entity.name, p.x - 11, p.y + 24);
-  }
-  ctx.globalAlpha = 1;
-}
-
-function render() {
-  drawBackground();
-  if (!snapshot?.payload?.entities?.length) {
-    emptyOverlay.style.display = "block";
-    return;
-  }
-
-  emptyOverlay.style.display = "none";
-  const selfTeam = snapshot.payload.meta?.selfTeam || 0;
-  for (const entity of snapshot.payload.entities) {
-    drawEntity(entity, selfTeam);
-  }
-}
-
-function handleSnapshot(msg) {
-  snapshot = msg;
-  updatedAt.textContent = new Date(msg.updatedAt).toLocaleTimeString();
-  countInfo.textContent = String(msg.payload.entities.length);
-  floatCount.textContent = `Đối tượng: ${msg.payload.entities.length}`;
-  render();
-}
-
-function connect(matchId) {
-  if (reconnectTimer) {
-    clearTimeout(reconnectTimer);
-    reconnectTimer = null;
-  }
-
-  if (ws) {
-    ws.onclose = null;
-    ws.close();
-  }
-
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const url = `${protocol}//${window.location.host}/ws?match=${encodeURIComponent(matchId)}`;
-  ws = new WebSocket(url);
-
-  ws.onopen = () => {
-    setWsState(true, "Đã kết nối");
-    ws.send(JSON.stringify({ type: "subscribe", matchId }));
+  const icons = {};
+  const socketState = {
+    ws: null,
+    retry: 0,
+    room: "",
+    lastReceived: 0,
+    frame: null
   };
 
-  ws.onmessage = (event) => {
-    try {
-      const msg = JSON.parse(event.data);
-      if (msg.type === "snapshot" && msg.matchId === matchId) {
-        handleSnapshot(msg);
+  let video = null;
+  let pipTimer = 0;
+  let pipBusy = false;
+  let mapImageLoaded = false;
+
+  function status(text) {
+    $("status").textContent = text;
+  }
+
+  function notice(text) {
+    $("notice").textContent = text;
+    $("notice").hidden = !text;
+  }
+
+  function sanitizeRoom(code) {
+    return String(code || "")
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 6);
+  }
+
+  function syncURL() {
+    const params = new URLSearchParams(location.search);
+    params.delete("room");
+    params.delete("compact");
+    if (socketState.room) params.set("room", socketState.room);
+    if (document.body.classList.contains("compact")) params.set("compact", "1");
+    history.replaceState(null, "", "/webmap" + (params.size ? "?" + params.toString() : ""));
+  }
+
+  function updateShare() {
+    const room = socketState.room;
+    const share = room
+      ? `${location.origin}/webmap/${encodeURIComponent(room)}`
+      : `${location.origin}/webmap`;
+    $("share-url").textContent = share;
+  }
+
+  function waitingText() {
+    return "Chờ iPhone phát bản đồ";
+  }
+
+  function setPerspectiveText(text) {
+    $("perspective").textContent = text;
+  }
+
+  function disconnect() {
+    clearTimeout(socketState.retry);
+    socketState.retry = 0;
+    const prev = socketState.ws;
+    socketState.ws = null;
+    prev?.close();
+  }
+
+  function resetFrame() {
+    socketState.frame = null;
+    socketState.lastReceived = 0;
+    $("age").textContent = "Chưa có dữ liệu";
+    $("latency").textContent = "RTT —";
+    renderMap();
+  }
+
+  function chooseRoom(code, writeURL = true) {
+    disconnect();
+    socketState.room = sanitizeRoom(code);
+    $("room").textContent = socketState.room || "—";
+    $("code").value = socketState.room;
+    updateShare();
+    resetFrame();
+    setPerspectiveText("Chờ luồng từ iPhone");
+    notice("");
+    status(socketState.room ? "Đang kết nối..." : "Chưa kết nối");
+    if (writeURL) syncURL();
+    if (socketState.room.length === 6) connect(socketState.room);
+  }
+
+  function parsePayload(msg) {
+    const entities = msg?.payload?.entities;
+    if (!Array.isArray(entities)) return null;
+    return {
+      camp: Number(msg?.payload?.meta?.selfTeam || 0),
+      actors: entities.map((e) => ({
+        id: String(e.id || ""),
+        name: String(e.name || ""),
+        hp: Number(e.hp || 0),
+        max: Number(e.maxHp || 1),
+        x: Number(e.x || 0),
+        y: Number(e.y || 0),
+        team: Number(e.team || 0),
+        dead: Boolean(e.dead)
+      }))
+    };
+  }
+
+  function connect(room) {
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const ws = new WebSocket(`${protocol}//${location.host}/ws?match=${encodeURIComponent(room)}`);
+    socketState.ws = ws;
+
+    ws.onopen = () => {
+      if (socketState.ws !== ws) return;
+      status(waitingText());
+      ws.send(JSON.stringify({ type: "subscribe", matchId: room }));
+    };
+
+    ws.onmessage = (event) => {
+      if (socketState.ws !== ws) return;
+
+      if (typeof event.data === "string") {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === "snapshot" && payload.matchId === room) {
+            const parsed = parsePayload(payload);
+            if (!parsed) return;
+            socketState.frame = parsed;
+            socketState.lastReceived = performance.now();
+            const count = parsed.actors.length;
+            status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
+            setPerspectiveText(parsed.camp ? `Góc nhìn Team ${parsed.camp}` : "Đang nhận dữ liệu trực tiếp");
+            $("age").textContent = "Cập nhật vài giây trước";
+            renderMap();
+            if (document.hidden && pipState()) renderMap();
+          } else if (payload.type === "pong" && Number.isFinite(payload.at)) {
+            const rtt = performance.now() - payload.at;
+            $("latency").textContent = "RTT " + (rtt < 1 ? "<1" : Math.round(rtt)) + " ms";
+          }
+        } catch (_err) {}
       }
-    } catch (_err) {}
+    };
+
+    ws.onclose = () => {
+      if (socketState.ws !== ws) return;
+      socketState.ws = null;
+      status("Luồng phát đã dừng / phòng chưa mở");
+      setPerspectiveText("Chờ luồng từ iPhone");
+      resetFrame();
+      socketState.retry = setTimeout(() => {
+        if (socketState.room === room && !socketState.ws) connect(room);
+      }, 2500);
+    };
+
+    ws.onerror = () => {
+      if (socketState.ws === ws) status("Không kết nối được phòng");
+    };
+  }
+
+  function pipVideo() {
+    if (video) return video;
+    video = document.createElement("video");
+    video.id = "pip-video";
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.setAttribute("aria-hidden", "true");
+    video.tabIndex = -1;
+    document.body.append(video);
+    return video;
+  }
+
+  function pipState() {
+    return (
+      !!video &&
+      (document.pictureInPictureElement === video ||
+        video.webkitPresentationMode === "picture-in-picture")
+    );
+  }
+
+  function syncPipButton() {
+    clearInterval(pipTimer);
+    pipTimer = 0;
+    const open = pipState();
+    $("pip").textContent = open ? "Đóng PiP" : "PiP";
+    $("pip").setAttribute("aria-pressed", String(open));
+    if (mobile) {
+      $("popup").textContent = open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi";
+      $("popup").setAttribute("aria-pressed", String(open));
+    }
+    if (open) pipTimer = setInterval(renderMap, 33);
+  }
+
+  async function togglePip() {
+    if (pipBusy) return;
+    notice("");
+    if (!socketState.room && !pipState()) {
+      notice("Nhập mã phòng và chọn Xem map trước khi mở cửa sổ nổi.");
+      return;
+    }
+    pipBusy = true;
+    $("pip").disabled = true;
+    if (mobile) $("popup").disabled = true;
+    try {
+      const v = pipVideo();
+      if (pipState()) {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else if (v.webkitPresentationMode === "picture-in-picture") {
+          v.webkitSetPresentationMode("inline");
+        }
+      } else {
+        const stream = canvas.captureStream(30);
+        if (v.srcObject !== stream) v.srcObject = stream;
+        await v.play();
+        if (v.requestPictureInPicture) {
+          await v.requestPictureInPicture();
+        } else if (v.webkitSupportsPresentationMode?.("picture-in-picture")) {
+          v.webkitSetPresentationMode("picture-in-picture");
+        } else {
+          notice("Trình duyệt chưa hỗ trợ PiP.");
+        }
+      }
+    } catch (_err) {
+      notice("Không mở được cửa sổ nổi PiP.");
+    } finally {
+      pipBusy = false;
+      $("pip").disabled = false;
+      if (mobile) $("popup").disabled = false;
+      syncPipButton();
+    }
+  }
+
+  function toCanvas(x01, y01) {
+    return { x: x01 * 900, y: (1 - y01) * 900 };
+  }
+
+  function background() {
+    ctx.fillStyle = "#182734";
+    ctx.fillRect(0, 0, 900, 900);
+    if (mapImageLoaded) {
+      ctx.drawImage(icons.terrain, 0, 0, 900, 900);
+    }
+  }
+
+  function drawActor(actor, camp) {
+    const p = toCanvas(actor.x, actor.y);
+    const ally = camp && actor.team === camp;
+    const color = ally ? "#5acbde" : "#e9797d";
+
+    ctx.globalAlpha = actor.dead ? 0.35 : 1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,255,255,.85)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const rate = Math.max(0, Math.min(1, actor.hp / Math.max(1, actor.max)));
+    ctx.fillStyle = "#16151fcc";
+    ctx.fillRect(p.x - 20, p.y - 18, 40, 5);
+    ctx.fillStyle = ally ? "#63cbdc" : "#e37d81";
+    ctx.fillRect(p.x - 20, p.y - 18, 40 * rate, 5);
+    ctx.globalAlpha = 1;
+  }
+
+  function renderMap() {
+    background();
+    const frame = socketState.frame;
+    const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
+    const live = !!frame && age < 3000;
+    $("map-message").hidden = socketState.room && live;
+    if (!socketState.room) $("map-message").textContent = "Nhập mã phòng để xem bản đồ";
+    else if (!live) $("map-message").textContent = "Chờ dữ liệu từ iPhone";
+    $("age").textContent =
+      socketState.lastReceived && age < 3000
+        ? "Cập nhật " + Math.round(age) + " ms trước"
+        : socketState.lastReceived
+          ? "Luồng phát đã dừng"
+          : "Chưa có dữ liệu";
+
+    if (!live) return;
+    for (const actor of frame.actors) {
+      drawActor(actor, frame.camp);
+    }
+  }
+
+  $("joinForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    chooseRoom($("code").value, true);
+  });
+
+  $("code").addEventListener("input", () => {
+    $("code").value = sanitizeRoom($("code").value);
+  });
+
+  $("reset-room").onclick = () => chooseRoom("", true);
+
+  $("compact").onclick = () => {
+    document.body.classList.toggle("compact");
+    $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+    syncURL();
   };
 
-  ws.onclose = () => {
-    setWsState(false, "Mất kết nối, đang thử lại...");
-    reconnectTimer = setTimeout(() => connect(matchId), 1300);
+  $("expand").onclick = () => {
+    document.body.classList.remove("compact");
+    $("compact").textContent = "Thu gọn";
+    syncURL();
   };
 
-  ws.onerror = () => ws.close();
-}
+  $("popup").onclick = () => {
+    if (mobile) {
+      togglePip();
+      return;
+    }
+    notice("");
+    if (!socketState.room) {
+      notice("Vào phòng trước khi mở cửa sổ nhỏ");
+      return;
+    }
+    const url = `/webmap/?room=${encodeURIComponent(socketState.room)}&compact=1`;
+    if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
+      notice("Trình duyệt đang chặn cửa sổ bật lên");
+    }
+  };
 
-function startMatch(code) {
-  const matchId = sanitizeCode(code);
-  if (matchId.length !== 6) {
-    setWsState(false, "Mã phòng phải đủ 6 ký tự");
-    return;
+  $("pip").onclick = togglePip;
+
+  $("fullscreen").onclick = async () => {
+    notice("");
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+      if ($("map-panel").requestFullscreen) {
+        await $("map-panel").requestFullscreen();
+      } else {
+        document.body.classList.toggle("compact");
+        $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+      }
+    } catch (_err) {
+      notice("Không mở được toàn màn hình");
+    }
+  };
+
+  $("copy-link").onclick = async () => {
+    const text = $("share-url").textContent || location.href;
+    try {
+      await navigator.clipboard.writeText(text);
+      $("copy-link").textContent = "Đã copy";
+      setTimeout(() => {
+        $("copy-link").textContent = "Copy Link";
+      }, 900);
+    } catch (_err) {
+      notice("Không copy được link");
+    }
+  };
+
+  addEventListener("visibilitychange", () => {
+    if (document.hidden && pipState()) renderMap();
+  });
+
+  addEventListener("pagehide", (e) => {
+    disconnect();
+    clearInterval(pipTimer);
+    if (!e.persisted) {
+      video?.srcObject?.getTracks().forEach((t) => t.stop());
+    }
+  });
+
+  function readURL() {
+    const params = new URLSearchParams(location.search);
+    let room = params.get("room") || "";
+    if (!room) {
+      const pathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
+      room = pathMatch ? pathMatch[1] : "";
+    }
+    document.body.classList.toggle("compact", params.get("compact") === "1");
+    $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+    chooseRoom(room, false);
   }
 
-  currentMatchId = matchId;
-  mapCodeInput.value = matchId;
-  updateShare(matchId);
-  resetSnapshotUI();
+  icons.terrain = new Image();
+  icons.terrain.onload = () => {
+    mapImageLoaded = true;
+    renderMap();
+  };
+  icons.terrain.onerror = () => {
+    mapImageLoaded = false;
+    renderMap();
+  };
+  icons.terrain.src = MAP_ASSET + "icons/terrain.png";
 
-  const nextUrl = `/webmap/${encodeURIComponent(matchId)}`;
-  if (window.location.pathname !== nextUrl) {
-    window.history.replaceState({}, "", nextUrl);
+  if (mobile) {
+    $("popup").textContent = "Cửa sổ nổi";
+    $("popup").title = "Hiển thị bản đồ trên ứng dụng khác";
   }
-  connect(matchId);
-}
-
-joinForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  startMatch(mapCodeInput.value);
-});
-
-mapCodeInput.addEventListener("input", () => {
-  mapCodeInput.value = sanitizeCode(mapCodeInput.value);
-});
-
-resetBtn.addEventListener("click", () => {
-  currentMatchId = "";
-  mapCodeInput.value = "";
-  updateShare("");
-  resetSnapshotUI();
-  if (ws) {
-    ws.onclose = null;
-    ws.close();
-    ws = null;
+  if (android && $("android-pip-help")) {
+    $("android-pip-help").hidden = false;
   }
-  setWsState(false, "Chưa kết nối");
-  window.history.replaceState({}, "", "/webmap");
-});
 
-copyLinkBtn.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(shareLink || window.location.href);
-    copyLinkBtn.textContent = "Đã copy";
-    setTimeout(() => {
-      copyLinkBtn.textContent = "Copy Link";
-    }, 900);
-  } catch (_err) {
-    copyLinkBtn.textContent = "Copy lỗi";
-  }
-});
+  setInterval(() => {
+    if (socketState.ws?.readyState === WebSocket.OPEN) {
+      socketState.ws.send(JSON.stringify({ type: "ping", at: performance.now() }));
+    }
+    renderMap();
+  }, 2000);
 
-compactBtn.addEventListener("click", () => {
-  document.body.classList.toggle("compact");
-});
-
-popupBtn.addEventListener("click", () => {
-  const target = shareLink || `${window.location.origin}/webmap`;
-  window.open(target, "webmap-popup", "width=520,height=720,resizable=yes");
-});
-
-fullscreenBtn.addEventListener("click", () => {
-  const elem = document.documentElement;
-  if (!document.fullscreenElement) {
-    elem.requestFullscreen().catch(() => {});
-  } else {
-    document.exitFullscreen().catch(() => {});
-  }
-});
-
-toggleFloatingBtn.addEventListener("click", () => {
-  const collapsed = floatingBody.style.display === "none";
-  floatingBody.style.display = collapsed ? "block" : "none";
-  toggleFloatingBtn.textContent = collapsed ? "Thu gọn" : "Mở";
-});
-
-let dragging = false;
-let dragOffsetX = 0;
-let dragOffsetY = 0;
-
-floatingHeader.addEventListener("pointerdown", (e) => {
-  if (e.target === toggleFloatingBtn) return;
-  dragging = true;
-  const rect = floatingPanel.getBoundingClientRect();
-  dragOffsetX = e.clientX - rect.left;
-  dragOffsetY = e.clientY - rect.top;
-  floatingHeader.setPointerCapture(e.pointerId);
-});
-
-floatingHeader.addEventListener("pointermove", (e) => {
-  if (!dragging) return;
-  const x = Math.max(0, e.clientX - dragOffsetX);
-  const y = Math.max(0, e.clientY - dragOffsetY);
-  floatingPanel.style.left = `${x}px`;
-  floatingPanel.style.top = `${y}px`;
-  floatingPanel.style.right = "auto";
-  floatingPanel.style.bottom = "auto";
-});
-
-floatingHeader.addEventListener("pointerup", (e) => {
-  dragging = false;
-  floatingHeader.releasePointerCapture(e.pointerId);
-});
-
-updateShare("");
-resetSnapshotUI();
-
-if (sanitizeCode(defaultMatch).length === 6) {
-  startMatch(defaultMatch);
-} else {
-  setWsState(false, "Nhập mã phòng 6 ký tự để xem");
-}
+  readURL();
+  updateShare();
+  syncPipButton();
+  renderMap();
+})();
