@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <title>VTHANGIOS · Web Map</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
@@ -12,8 +16,14 @@
       <header class="page-head">
         <a href="/webmap/" class="brand">✦ VTHANGIOS <span>WEB MAP</span></a>
         <div class="tools">
-          <button id="compact">Thu gọn</button>
-          <button id="popup">Cửa sổ nhỏ</button>
+          <button id="compact" class="btn-icon">
+            <i class="bi bi-arrows-collapse"></i>
+            <span class="btn-text">Thu gọn</span>
+          </button>
+          <button id="popup" class="btn-icon">
+            <i class="bi bi-window-stack"></i>
+            <span class="btn-text">Cửa sổ nhỏ</span>
+          </button>
         </div>
       </header>
 
@@ -21,8 +31,14 @@
         <form id="joinForm">
           <label for="code">Mã phòng</label>
           <input id="code" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}" placeholder="6 ký tự" autocomplete="off" autocapitalize="characters" required />
-          <button type="submit">Xem map</button>
-          <button type="button" id="reset-room">Đổi mã</button>
+          <button type="submit" class="btn-icon">
+            <i class="bi bi-eye"></i>
+            <span class="btn-text">Xem map</span>
+          </button>
+          <button type="button" id="reset-room" class="btn-icon">
+            <i class="bi bi-arrow-clockwise"></i>
+            <span class="btn-text">Đổi mã</span>
+          </button>
         </form>
         <p id="pair">Trong game tạo mã phòng Web Map rồi nhập vào đây để xem.</p>
       </section>
@@ -37,9 +53,18 @@
               <p id="perspective">Chờ luồng từ iPhone</p>
             </div>
             <div class="map-tools">
-              <button id="expand" class="expand" title="Mở rộng">↗</button>
-              <button id="pip" title="Nổi trên ứng dụng">PiP</button>
-              <button id="fullscreen" title="Toàn màn hình">⛶</button>
+              <button id="expand" class="expand btn-icon" title="Mở rộng">
+                <i class="bi bi-arrows-angle-expand"></i>
+                <span class="btn-text">Mở rộng</span>
+              </button>
+              <button id="pip" class="btn-icon" title="Nổi trên ứng dụng">
+                <i class="bi bi-pip"></i>
+                <span class="btn-text">PiP</span>
+              </button>
+              <button id="fullscreen" class="btn-icon" title="Toàn màn hình">
+                <i class="bi bi-fullscreen"></i>
+                <span class="btn-text">Toàn màn hình</span>
+              </button>
             </div>
           </div>
           <p id="notice" class="map-notice" role="status" hidden></p>
@@ -67,7 +92,10 @@
             </dl>
             <p class="share-label">Link share</p>
             <code id="share-url">—</code>
-            <button id="copy-link">Copy Link</button>
+            <button id="copy-link" class="btn-icon">
+              <i class="bi bi-copy"></i>
+              <span class="btn-text">Copy Link</span>
+            </button>
           </section>
         </aside>
       </div>

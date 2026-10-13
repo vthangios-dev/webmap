@@ -30,6 +30,17 @@
     $("status").textContent = text;
   }
 
+  function setButtonText(id, text) {
+    const button = $(id);
+    if (!button) return;
+    const span = button.querySelector(".btn-text");
+    if (span) {
+      span.textContent = text;
+      return;
+    }
+    button.textContent = text;
+  }
+
   function notice(text) {
     $("notice").textContent = text;
     $("notice").hidden = !text;
@@ -194,10 +205,10 @@
     clearInterval(pipTimer);
     pipTimer = 0;
     const open = pipState();
-    $("pip").textContent = open ? "Đóng PiP" : "PiP";
+    setButtonText("pip", open ? "Đóng PiP" : "PiP");
     $("pip").setAttribute("aria-pressed", String(open));
     if (mobile) {
-      $("popup").textContent = open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi";
+      setButtonText("popup", open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi");
       $("popup").setAttribute("aria-pressed", String(open));
     }
     if (open) pipTimer = setInterval(renderMap, 33);
@@ -313,13 +324,13 @@
 
   $("compact").onclick = () => {
     document.body.classList.toggle("compact");
-    $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+    setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
     syncURL();
   };
 
   $("expand").onclick = () => {
     document.body.classList.remove("compact");
-    $("compact").textContent = "Thu gọn";
+    setButtonText("compact", "Thu gọn");
     syncURL();
   };
 
@@ -352,7 +363,7 @@
         await $("map-panel").requestFullscreen();
       } else {
         document.body.classList.toggle("compact");
-        $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+        setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
       }
     } catch (_err) {
       notice("Không mở được toàn màn hình");
@@ -363,9 +374,9 @@
     const text = $("share-url").textContent || location.href;
     try {
       await navigator.clipboard.writeText(text);
-      $("copy-link").textContent = "Đã copy";
+      setButtonText("copy-link", "Đã copy");
       setTimeout(() => {
-        $("copy-link").textContent = "Copy Link";
+        setButtonText("copy-link", "Copy Link");
       }, 900);
     } catch (_err) {
       notice("Không copy được link");
@@ -392,7 +403,7 @@
       room = pathMatch ? pathMatch[1] : "";
     }
     document.body.classList.toggle("compact", params.get("compact") === "1");
-    $("compact").textContent = document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn";
+    setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
     chooseRoom(room, false);
   }
 
@@ -408,7 +419,7 @@
   icons.terrain.src = MAP_ASSET + "icons/terrain.png";
 
   if (mobile) {
-    $("popup").textContent = "Cửa sổ nổi";
+    setButtonText("popup", "Cửa sổ nổi");
     $("popup").title = "Hiển thị bản đồ trên ứng dụng khác";
   }
   if (android && $("android-pip-help")) {
