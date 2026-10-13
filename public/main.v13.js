@@ -380,14 +380,14 @@
       const hpRadius = radius + 1;
       const hpArcStart = -Math.PI / 2;
       const hpArcSpan = Math.PI * 2;
+      const teamRingColor = self
+        ? "rgba(95, 228, 124, 0.98)"
+        : ally
+          ? "rgba(72, 206, 255, 0.98)"
+          : "rgba(238, 74, 92, 0.99)";
       if (hpRate > 0.01) {
-        const hpColor = hpRate > 0.65
-          ? "rgba(95, 228, 124, 0.98)"
-          : hpRate > 0.35
-            ? "rgba(242, 190, 74, 0.99)"
-            : "rgba(238, 74, 92, 1)";
         ctx.beginPath();
-        ctx.strokeStyle = hpColor;
+        ctx.strokeStyle = teamRingColor;
         ctx.lineWidth = hpLineWidth;
         ctx.lineCap = "round";
         ctx.arc(x, y, hpRadius, hpArcStart, hpArcStart + hpArcSpan * hpRate);
