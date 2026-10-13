@@ -353,7 +353,7 @@
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
       const hpRate = clamp01(actor.hp / Math.max(1, actor.maxHp));
-      const radius = self ? Math.round(ESP_ICON_SIZE * 0.58) : Math.round(ESP_ICON_SIZE * 0.53);
+      const radius = self ? Math.round(ESP_ICON_SIZE * 0.63) : Math.round(ESP_ICON_SIZE * 0.58);
       const icon = getHeroIcon(actor.heroId);
       if (icon?.complete && icon.naturalWidth > 0) {
         const srcW = icon.naturalWidth;
