@@ -231,11 +231,10 @@ canvas {
   font-size: 34px;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
   background:
-    linear-gradient(45deg, rgba(73, 147, 255, 0.18) 25%, transparent 25%, transparent 75%, rgba(73, 147, 255, 0.18) 75%),
-    linear-gradient(45deg, rgba(44, 108, 204, 0.2) 25%, transparent 25%, transparent 75%, rgba(44, 108, 204, 0.2) 75%),
-    linear-gradient(180deg, rgba(15, 28, 49, 0.9), rgba(10, 20, 36, 0.94));
-  background-size: 36px 36px, 36px 36px, 100% 100%;
-  background-position: 0 0, 18px 18px, 0 0;
+    radial-gradient(circle at 20% 18%, rgba(95, 173, 255, 0.2), transparent 42%),
+    radial-gradient(circle at 78% 20%, rgba(126, 120, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 68% 84%, rgba(69, 144, 255, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(16, 27, 45, 0.92), rgba(11, 19, 33, 0.96));
 }
 
 .map-message[hidden] {
