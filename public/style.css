@@ -431,6 +431,22 @@ body.compact .pip-help {
   }
 }
 
+@media (min-width: 861px) {
+  .viewer-card {
+    max-width: 860px;
+  }
+
+  .map-stage {
+    aspect-ratio: 16 / 9;
+  }
+
+  canvas {
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+  }
+}
+
 @keyframes livePulse {
   0%,
   100% {
