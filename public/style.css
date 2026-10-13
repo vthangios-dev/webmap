@@ -1,17 +1,16 @@
 :root {
   color-scheme: dark;
-  --bg: #060b14;
-  --panel: #121c30;
-  --panel-2: #0f1729;
-  --line: #24395d;
-  --line-soft: #1d2f4d;
-  --line-strong: #34598f;
-  --text: #edf4ff;
-  --text-muted: #9eb1d2;
-  --brand: #8ab8ff;
-  --primary: #3f7ded;
-  --primary-hover: #528df8;
-  --ok: #90e3cb;
+  --bg: #070b14;
+  --bg-soft: #0b1220;
+  --panel: #111a2d;
+  --panel-soft: #0f1728;
+  --line: #223554;
+  --line-strong: #304c78;
+  --text: #edf3ff;
+  --text-muted: #9aaccb;
+  --brand: #8bb8ff;
+  --accent: #4f84e8;
+  --success: #8fdfca;
 }
 
 * {
@@ -24,23 +23,23 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 12% -14%, #1a2b48 0%, transparent 40%),
-    radial-gradient(circle at 92% 120%, #1a263f 0%, transparent 42%),
+    radial-gradient(circle at 12% -14%, #1a2842 0%, transparent 42%),
+    radial-gradient(circle at 90% 120%, #16233b 0%, transparent 40%),
     linear-gradient(180deg, #050912 0%, var(--bg) 100%);
 }
 
 .layout {
-  max-width: 1240px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 26px 20px 22px;
+  padding: 22px 18px 20px;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .brand-area {
@@ -52,16 +51,16 @@ body {
   text-decoration: none;
   color: var(--brand);
   font-weight: 900;
-  letter-spacing: 0.1em;
-  font-size: 32px;
+  font-size: 42px;
+  letter-spacing: 0.08em;
   line-height: 1;
 }
 
 .brand-sub {
   margin: 0;
   color: var(--text-muted);
-  letter-spacing: 0.11em;
   font-size: 11px;
+  letter-spacing: 0.12em;
 }
 
 .actions,
@@ -73,38 +72,38 @@ body {
 .btn {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: linear-gradient(180deg, #1a2945 0%, #142239 100%);
+  background: linear-gradient(180deg, #1a2944 0%, #142138 100%);
   color: var(--text);
   font: inherit;
-  padding: 9px 13px;
+  padding: 8px 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   cursor: pointer;
-  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+  transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
 }
 
 .btn:hover,
 .btn:focus-visible {
   border-color: var(--line-strong);
-  background: linear-gradient(180deg, #21355a 0%, #172844 100%);
+  background: linear-gradient(180deg, #213559 0%, #182944 100%);
   transform: translateY(-1px);
 }
 
 .btn:disabled {
-  opacity: 0.58;
+  opacity: 0.55;
   transform: none;
   cursor: default;
 }
 
 .pip-help {
-  margin: 0 0 12px;
-  padding: 10px 12px;
+  margin: 0 0 11px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  border: 1px solid var(--line-soft);
-  background: rgba(16, 28, 49, 0.76);
-  color: #9fb5da;
+  background: rgba(15, 25, 42, 0.7);
+  color: #9bb1d5;
   font-size: 12px;
 }
 
@@ -115,40 +114,39 @@ body {
 .dashboard {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 16px;
+  gap: 14px;
   align-items: start;
 }
 
 .viewer-card,
 .session-card {
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: linear-gradient(180deg, #131f35 0%, #0f182b 100%);
-  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.34);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #121d32 0%, #0f1829 100%);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
 }
 
 .viewer-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
 }
 
 .live-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255, 86, 120, 0.5);
   border-radius: 999px;
+  border: 1px solid rgba(255, 116, 139, 0.45);
+  background: rgba(255, 88, 117, 0.14);
+  color: #ffd9e1;
   padding: 2px 8px;
-  background: linear-gradient(180deg, rgba(255, 104, 136, 0.24), rgba(255, 63, 98, 0.2));
-  color: #ffd7e1;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   margin-bottom: 8px;
-  box-shadow: 0 0 0 1px rgba(255, 120, 147, 0.12) inset;
 }
 
 .live-badge::before {
@@ -156,21 +154,20 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ff5b82;
-  box-shadow: 0 0 10px rgba(255, 91, 130, 0.8);
-  animation: livePulse 1.4s ease-in-out infinite;
+  background: #ff6386;
+  box-shadow: 0 0 8px rgba(255, 99, 134, 0.6);
 }
 
 .viewer-head h1 {
   margin: 0;
   font-size: 26px;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 .viewer-head p {
   margin: 6px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .viewer-tools .btn {
@@ -185,11 +182,11 @@ body {
 
 .map-notice {
   margin: 0 12px 10px;
-  padding: 9px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(214, 165, 94, 0.5);
-  background: rgba(82, 62, 31, 0.6);
-  color: #f1d196;
+  padding: 8px 10px;
+  border: 1px solid rgba(218, 167, 92, 0.52);
+  border-radius: 9px;
+  background: rgba(84, 62, 31, 0.58);
+  color: #f3d093;
   font-size: 11px;
 }
 
@@ -200,19 +197,18 @@ body {
 .map-stage {
   position: relative;
   margin: 0 12px 12px;
-  border: 1px solid #2a4168;
+  border: 1px solid #294063;
   border-radius: 12px;
   overflow: hidden;
-  background: #0c1424;
+  background: #0b1322;
 }
 
 canvas {
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 12px;
-  touch-action: manipulation;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .map-message {
@@ -222,36 +218,16 @@ canvas {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 28px;
-  color: #bfd2f0;
-  background: rgba(10, 17, 30, 0.6);
-  font-size: 18px;
-  pointer-events: none;
-}
-
-.map-panel.is-waiting .map-message {
+  padding: 26px;
+  color: #d7e4fb;
   background:
-    radial-gradient(circle at 18% 20%, rgba(88, 161, 255, 0.32), transparent 42%),
-    radial-gradient(circle at 82% 16%, rgba(132, 110, 255, 0.28), transparent 40%),
-    radial-gradient(circle at 74% 78%, rgba(77, 150, 255, 0.2), transparent 38%),
-    linear-gradient(140deg, rgba(13, 23, 40, 0.9), rgba(9, 16, 29, 0.95));
-  color: #d7e6ff;
-  text-shadow: 0 0 14px rgba(121, 177, 255, 0.35);
-  animation: waitingSheen 6.5s ease-in-out infinite;
-}
-
-.map-panel.is-waiting .map-message::before {
-  content: "";
-  position: absolute;
-  inset: -40% -15%;
+    radial-gradient(circle at 20% 18%, rgba(90, 158, 248, 0.22), transparent 42%),
+    radial-gradient(circle at 80% 16%, rgba(134, 114, 245, 0.2), transparent 40%),
+    linear-gradient(140deg, rgba(14, 24, 40, 0.86), rgba(10, 17, 30, 0.92));
+  font-size: 38px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 12px rgba(126, 177, 255, 0.22);
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(146, 197, 255, 0.16) 48%,
-    rgba(255, 255, 255, 0) 64%
-  );
-  animation: waitingSweep 4.8s linear infinite;
 }
 
 .map-message[hidden] {
@@ -259,12 +235,12 @@ canvas {
 }
 
 .session-card {
-  padding: 16px;
+  padding: 14px;
 }
 
 .session-card h2 {
   margin: 0 0 12px;
-  font-size: 24px;
+  font-size: 36px;
   line-height: 1;
 }
 
@@ -278,8 +254,8 @@ dl div {
   align-items: baseline;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px dashed #2a3e61;
-  font-size: 14px;
+  border-bottom: 1px dashed #2a3f63;
+  font-size: 18px;
 }
 
 dl div:last-child {
@@ -298,28 +274,28 @@ dd {
 }
 
 #room {
-  color: #e0c58b;
+  color: #e4c88d;
   letter-spacing: 0.1em;
 }
 
 #latency {
-  color: var(--ok);
+  color: var(--success);
 }
 
 .share-label {
-  margin: 12px 0 6px;
+  margin: 11px 0 6px;
   color: var(--text-muted);
   font-size: 13px;
 }
 
 code {
   display: block;
-  padding: 9px 10px;
+  padding: 9px;
   border-radius: 10px;
-  border: 1px solid #2c466e;
+  border: 1px solid #2d466d;
   background: #0b1424;
-  color: #cbddf6;
-  font-size: 13px;
+  color: #ccdcf5;
+  font-size: 15px;
   word-break: break-all;
 }
 
@@ -356,23 +332,23 @@ body.compact .dashboard {
 }
 
 body.compact .viewer-card {
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
 body.compact .viewer-head {
-  padding: 7px 8px;
-}
-
-body.compact .viewer-head h1 {
-  font-size: 22px;
-}
-
-body.compact .viewer-head p {
-  font-size: 11px;
+  padding: 6px 8px;
 }
 
 body.compact .live-badge {
   display: none;
+}
+
+body.compact .viewer-head h1 {
+  font-size: 18px;
+}
+
+body.compact .viewer-head p {
+  font-size: 10px;
 }
 
 body.compact .viewer-tools .btn {
@@ -390,45 +366,16 @@ body.compact .map-stage {
   margin: 0 4px 4px;
 }
 
+body.compact .map-message {
+  font-size: 22px;
+}
+
 body.compact .expand {
   display: inline-flex;
 }
 
 body.compact .pip-help {
   display: none;
-}
-
-@media (max-width: 860px) {
-  .layout {
-    padding: 14px 12px;
-    max-width: 520px;
-  }
-
-  .brand {
-    font-size: 28px;
-  }
-
-  .viewer-head h1,
-  .session-card h2 {
-    font-size: 24px;
-  }
-
-  dl div {
-    font-size: 14px;
-  }
-
-  .dashboard {
-    display: block;
-  }
-
-  .viewer-card {
-    margin-bottom: 14px;
-  }
-
-  .viewer-tools .btn-text,
-  .actions .btn-text {
-    display: none;
-  }
 }
 
 @media (min-width: 861px) {
@@ -447,33 +394,46 @@ body.compact .pip-help {
   }
 }
 
-@keyframes livePulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.9;
+@media (max-width: 860px) {
+  .layout {
+    max-width: 520px;
+    padding: 14px 12px;
   }
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-  }
-}
 
-@keyframes waitingSweep {
-  0% {
-    transform: translateX(-55%) translateY(-6%) rotate(3deg);
+  .brand {
+    font-size: 28px;
   }
-  100% {
-    transform: translateX(55%) translateY(6%) rotate(3deg);
-  }
-}
 
-@keyframes waitingSheen {
-  0%,
-  100% {
-    filter: saturate(1);
+  .viewer-head h1 {
+    font-size: 22px;
   }
-  50% {
-    filter: saturate(1.2);
+
+  .map-message {
+    font-size: 26px;
+  }
+
+  .session-card h2 {
+    font-size: 28px;
+  }
+
+  dl div {
+    font-size: 15px;
+  }
+
+  code {
+    font-size: 12px;
+  }
+
+  .dashboard {
+    display: block;
+  }
+
+  .viewer-card {
+    margin-bottom: 14px;
+  }
+
+  .viewer-tools .btn-text,
+  .actions .btn-text {
+    display: none;
   }
 }
