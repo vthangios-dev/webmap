@@ -72,16 +72,16 @@
     const params = new URLSearchParams(location.search);
     params.delete("room");
     params.delete("compact");
+    if (socketState.room) params.set("room", socketState.room);
     if (document.body.classList.contains("compact")) params.set("compact", "1");
-    const basePath = socketState.room ? `/${encodeURIComponent(socketState.room)}` : "/";
-    history.replaceState(null, "", basePath + (params.size ? "?" + params.toString() : ""));
+    history.replaceState(null, "", "/webmap" + (params.size ? "?" + params.toString() : ""));
   }
 
   function updateShare() {
     const room = socketState.room;
     const share = room
-      ? `${location.origin}/${encodeURIComponent(room)}`
-      : `${location.origin}/`;
+      ? `${location.origin}/webmap/${encodeURIComponent(room)}`
+      : `${location.origin}/webmap`;
     $("share-url").textContent = share;
   }
 
@@ -106,6 +106,7 @@
     socketState.lastSeq = 0;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
+    $("latency").textContent = "— ms";
     renderMap();
   }
 
@@ -182,6 +183,7 @@
             if (document.hidden && pipState()) renderMap();
           } else if (payload.type === "pong" && Number.isFinite(payload.at)) {
             const rtt = performance.now() - payload.at;
+            $("latency").textContent = (rtt < 1 ? "<1" : Math.round(rtt)) + " ms";
           }
         } catch (_err) {}
       }
@@ -419,7 +421,7 @@
       notice("Vào phòng trước khi mở cửa sổ nhỏ");
       return;
     }
-    const url = `/${encodeURIComponent(socketState.room)}?compact=1`;
+    const url = `/webmap/${encodeURIComponent(socketState.room)}?compact=1`;
     if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
       notice("Trình duyệt đang chặn cửa sổ bật lên");
     }
@@ -475,15 +477,8 @@
   function readURL() {
     const params = new URLSearchParams(location.search);
     let room = params.get("room") || "";
-    const shortPathMatch = location.pathname.match(/^\/([A-Za-z0-9]{6})$/);
-    const legacyPathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
-    const roomFromPath = !room
-      ? shortPathMatch
-        ? shortPathMatch[1]
-        : legacyPathMatch
-          ? legacyPathMatch[1]
-          : ""
-      : "";
+    const pathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
+    const roomFromPath = !room && pathMatch ? pathMatch[1] : "";
     if (roomFromPath) room = roomFromPath;
 
     const viewerMode = !!roomFromPath;

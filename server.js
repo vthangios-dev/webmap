@@ -128,10 +128,6 @@ app.get("/webmap", (_req, res) => {
   renderIndex(res);
 });
 
-app.get("/:matchId([A-Za-z0-9]{6})", (_req, res) => {
-  renderIndex(res);
-});
-
 app.post("/api/ingest/:matchId", (req, res) => {
   const matchId = sanitizeMatchId(req.params.matchId);
   if (!matchId) {

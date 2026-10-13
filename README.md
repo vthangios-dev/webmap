@@ -64,18 +64,18 @@ Khuyến nghị dùng reverse proxy (Nginx/Caddy) trỏ về app Node:
 Viewer link production:
 
 - `https://map.vthangios.xyz/`
-- `https://map.vthangios.xyz/<matchId>`
-- `https://map.vthangios.xyz/webmap/<matchId>` (legacy, vẫn hỗ trợ)
+- `https://map.vthangios.xyz/webmap`
+- `https://map.vthangios.xyz/webmap/<matchId>`
 
 ## 5) Cache bust thủ công (đổi tên file)
 
 Project đang dùng chế độ **manual filename** cho asset:
 
-- CSS: `/style.v12.css`
-- JS: `/app.v12.js`
+- CSS: `/style.v11.css`
+- JS: `/app.v11.js`
 
 Khi sửa frontend và muốn chắc chắn trình duyệt không dùng cache cũ:
 
-1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.v13.css`, `app.v13.js`)
+1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.v12.css`, `app.v12.js`)
 2. Sửa lại 2 đường dẫn tương ứng trong `public/index.html`
 3. Restart server
