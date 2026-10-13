@@ -27,9 +27,6 @@ npm run dev
 Header:
 
 - `Content-Type: application/json`
-- `x-map-token: <MAP_INGEST_TOKEN>` (chỉ cần khi bật token)
-
-> Nếu muốn chạy nhanh không cần token, để `MAP_INGEST_TOKEN=` trong `.env`.
 
 Body mẫu:
 
@@ -67,13 +64,6 @@ curl -X POST "http://localhost:3016/api/ingest/test-match" \
   -H "Content-Type: application/json" \
   -d '{"ts":1728838800000,"meta":{"selfTeam":1},"entities":[{"id":"self","name":"Me","team":1,"x":0.22,"y":0.44,"hp":9450,"maxHp":9450,"dead":false},{"id":"enemy-1","name":"Enemy A","team":2,"x":0.61,"y":0.52,"hp":5100,"maxHp":7000,"dead":false}]}'
 ```
-
-Nếu bật token, thêm header:
-
-```bash
--H "x-map-token: <MAP_INGEST_TOKEN>"
-```
-
 
 ## 4) Deploy SSH + domain `https://map.vthangios.xyz/`
 

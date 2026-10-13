@@ -7,8 +7,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const PORT = Number(process.env.PORT || 3016);
-const MAP_INGEST_TOKEN = process.env.MAP_INGEST_TOKEN || "";
-const INGEST_AUTH_ENABLED = MAP_INGEST_TOKEN.trim().length > 0;
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
@@ -102,12 +100,6 @@ function broadcast(matchId, data) {
   }
 }
 
-function isAuthorized(req) {
-  if (!INGEST_AUTH_ENABLED) return true;
-  const token = req.header("x-map-token") || "";
-  return token === MAP_INGEST_TOKEN;
-}
-
 app.get("/health", (_req, res) => {
   res.json({
     ok: true,
@@ -125,10 +117,6 @@ app.get("/webmap", (_req, res) => {
 });
 
 app.post("/api/ingest/:matchId", (req, res) => {
-  if (!isAuthorized(req)) {
-    return res.status(401).json({ ok: false, error: "Unauthorized" });
-  }
-
   const matchId = sanitizeMatchId(req.params.matchId);
   if (!matchId) {
     return res.status(400).json({ ok: false, error: "Invalid matchId" });
@@ -205,9 +193,5 @@ wss.on("connection", (ws, req) => {
 
 server.listen(PORT, () => {
   console.log(`Webmap server listening on :${PORT}`);
-  console.log(
-    INGEST_AUTH_ENABLED
-      ? "Ingest auth: ON (x-map-token required)"
-      : "Ingest auth: OFF (no token required)"
-  );
+  console.log("Ingest auth: OFF (no token required)");
 });
