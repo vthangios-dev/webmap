@@ -18,19 +18,17 @@
     room: "",
     lastReceived: 0,
     lastSeq: 0,
-    frame: null,
-    mapFrameKey: "",
-    mapFrameImage: null,
-    pendingMapFrame: null
+    frame: null
   };
 
   let video = null;
   let pipTimer = 0;
   let pipBusy = false;
   let canvasScale = 1;
-  let mapFrameDecodeBusy = false;
   const heroIconCache = new Map();
-  const LIVE_ENEMY_ICON_RADIUS = 28;
+  const mapImage = new Image();
+  mapImage.onload = () => renderMap();
+  mapImage.src = "/assets/icons/minimap.png";
 
   function clamp01(value) {
     const n = Number(value);
@@ -68,39 +66,6 @@
 
   function status(text) {
     $("status").textContent = text;
-  }
-
-  function consumePendingMapFrame() {
-    if (mapFrameDecodeBusy || !socketState.pendingMapFrame) return;
-    const task = socketState.pendingMapFrame;
-    socketState.pendingMapFrame = null;
-    mapFrameDecodeBusy = true;
-    const image = new Image();
-    image.onload = () => {
-      socketState.mapFrameImage = image;
-      socketState.mapFrameKey = task.key;
-      mapFrameDecodeBusy = false;
-      renderMap();
-      consumePendingMapFrame();
-    };
-    image.onerror = () => {
-      mapFrameDecodeBusy = false;
-      consumePendingMapFrame();
-    };
-    image.src = `data:${task.mime};base64,${task.data}`;
-  }
-
-  function updateMapFrame(frame) {
-    const mf = frame?.mapFrame;
-    if (!mf || !mf.data) return;
-    const key = `${mf.ts || 0}:${mf.data.length}:${mf.w || 0}x${mf.h || 0}`;
-    if (key === socketState.mapFrameKey) return;
-    socketState.pendingMapFrame = {
-      key,
-      mime: mf.mime || "image/jpeg",
-      data: mf.data
-    };
-    consumePendingMapFrame();
   }
 
   function setButtonText(id, text) {
@@ -163,10 +128,6 @@
   function resetFrame() {
     socketState.frame = null;
     socketState.lastSeq = 0;
-    socketState.mapFrameKey = "";
-    socketState.mapFrameImage = null;
-    socketState.pendingMapFrame = null;
-    mapFrameDecodeBusy = false;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
     renderMap();
@@ -208,16 +169,7 @@
         dead: !!entity?.dead,
         visible: entity?.visible !== false,
         isSelf: !!entity?.isSelf
-      })),
-      mapFrame: msg?.payload?.mapFrame && typeof msg.payload.mapFrame === "object"
-        ? {
-            mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
-            data: String(msg.payload.mapFrame.data || ""),
-            w: Number(msg.payload.mapFrame.w || 0),
-            h: Number(msg.payload.mapFrame.h || 0),
-            ts: Number(msg.payload.mapFrame.ts || 0)
-          }
-        : null
+      }))
     };
   }
 
@@ -246,17 +198,11 @@
             if (!parsed) return;
             socketState.frame = parsed;
             socketState.lastReceived = performance.now();
-            updateMapFrame(parsed);
             const count = parsed.actorCount;
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
-            const hasLiveFrame = !!parsed.mapFrame?.data;
-            setPerspectiveText(hasLiveFrame
-              ? (parsed.camp
-                  ? `Góc nhìn Team ${parsed.camp} • Minimap trực tiếp từ game`
-                  : "Đang nhận minimap trực tiếp")
-              : (parsed.camp
-                  ? `Góc nhìn Team ${parsed.camp} • Minimap render dữ liệu`
-                  : "Đang nhận minimap realtime"));
+            setPerspectiveText(parsed.camp
+              ? `Góc nhìn Team ${parsed.camp} • Minimap tĩnh + icon realtime`
+              : "Đang nhận minimap + icon realtime");
             $("age").textContent = "Cập nhật vài giây trước";
             renderMap();
             if (document.hidden && pipState()) renderMap();
@@ -358,39 +304,13 @@
     }
   }
 
-  function drawLiveMapFrameBackground() {
-    const image = socketState.mapFrameImage;
-    if (!image) return false;
-
-    const srcW = image.naturalWidth || image.width || 0;
-    const srcH = image.naturalHeight || image.height || 0;
-    if (srcW < 2 || srcH < 2) return false;
-
-    const scale = Math.min(LOGICAL_MAP_SIZE / srcW, LOGICAL_MAP_SIZE / srcH);
-    const drawW = Math.max(1, Math.round(srcW * scale));
-    const drawH = Math.max(1, Math.round(srcH * scale));
-    const dx = Math.floor((LOGICAL_MAP_SIZE - drawW) * 0.5);
-    const dy = Math.floor((LOGICAL_MAP_SIZE - drawH) * 0.5);
-
+  function background() {
     ctx.fillStyle = "#0b1220";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
-    ctx.save();
-    const prevSmooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
-    ctx.filter = "none";
-    ctx.drawImage(image, 0, 0, srcW, srcH, dx, dy, drawW, drawH);
-    ctx.imageSmoothingEnabled = prevSmooth;
-    ctx.restore();
-    return true;
-  }
-
-  function background(showLiveFrame) {
-    if (showLiveFrame && drawLiveMapFrameBackground()) {
+    if (mapImage.complete && mapImage.naturalWidth > 0) {
+      ctx.drawImage(mapImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
       return;
     }
-
-    ctx.fillStyle = "#0b1220";
-    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     const cell = 44;
     ctx.strokeStyle = "rgba(166, 194, 232, 0.16)";
     ctx.lineWidth = 1;
@@ -406,55 +326,37 @@
     }
   }
 
-  function drawActors(frame, enemyOnly = false) {
+  function drawActors(frame) {
     if (!frame || !Array.isArray(frame.entities)) return;
-    const drawnEnemyIds = enemyOnly ? new Set() : null;
+    const drawnIds = new Set();
     for (const actor of frame.entities) {
       if (actor.dead) continue;
-      if (!enemyOnly && !actor.visible) continue;
-      if (enemyOnly && (actor.isSelf || (frame.camp > 0 && actor.team === frame.camp))) continue;
-      if (enemyOnly && actor.visible) continue;
-      if (enemyOnly) {
-        const dedupeKey = actor.id || `${actor.heroId}:${actor.team}:${actor.x}:${actor.y}`;
-        if (drawnEnemyIds.has(dedupeKey)) continue;
-        drawnEnemyIds.add(dedupeKey);
-      }
+      if (actor.team <= 0) continue;
+      const dedupeKey = actor.id || `${actor.heroId}:${actor.team}:${actor.x}:${actor.y}`;
+      if (drawnIds.has(dedupeKey)) continue;
+      drawnIds.add(dedupeKey);
       const x = clamp01(actor.x) * LOGICAL_MAP_SIZE;
       const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
-      const radius = enemyOnly ? LIVE_ENEMY_ICON_RADIUS : (self ? 10 : 7);
-
-      if (enemyOnly) {
-        const icon = getHeroIcon(actor.heroId);
-        if (icon?.complete && icon.naturalWidth > 0) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.clip();
-          ctx.drawImage(icon, x - radius, y - radius, radius * 2, radius * 2);
-          ctx.restore();
-        } else {
-          ctx.beginPath();
-          ctx.fillStyle = "#ff445e";
-          ctx.arc(x, y, radius - 8, 0, Math.PI * 2);
-          ctx.fill();
-        }
+      const radius = self ? 15 : 13;
+      const icon = getHeroIcon(actor.heroId);
+      if (icon?.complete && icon.naturalWidth > 0) {
+        ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 64, 92, 0.98)";
-        ctx.lineWidth = 1.5;
-        ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
-        ctx.stroke();
-        continue;
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(icon, x - radius, y - radius, radius * 2, radius * 2);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.fillStyle = ally ? "#39b7ff" : "#ff4d63";
+        ctx.arc(x, y, radius - 2, 0, Math.PI * 2);
+        ctx.fill();
       }
-
       ctx.beginPath();
-      ctx.fillStyle = self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82";
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(9, 14, 24, 0.85)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = self ? "#8dff3a" : ally ? "rgba(79, 196, 255, 0.95)" : "rgba(255, 68, 94, 0.98)";
+      ctx.lineWidth = self ? 3 : 2;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
     }
@@ -480,10 +382,8 @@
     const frame = socketState.frame;
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
-    const frameHasMapFrame = !!frame?.mapFrame?.data;
-    const hasLiveMapFrame = frameHasMapFrame && !!socketState.mapFrameImage;
     setLiveBadge(live);
-    background(hasLiveMapFrame);
+    background();
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
     if (!live) {
@@ -496,7 +396,7 @@
           ? "Luồng phát đã dừng"
           : "Chưa có dữ liệu";
     if (!live) return;
-    if (!hasLiveMapFrame) drawActors(frame, false);
+    drawActors(frame);
     return;
   }
 
