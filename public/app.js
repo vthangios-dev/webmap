@@ -318,9 +318,9 @@
   }
 
   function background() {
-    ctx.fillStyle = "#0b1220";
-    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     if (socketState.mapFrameImage) {
+      ctx.fillStyle = "#0b1220";
+      ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
       ctx.save();
       const prevSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
@@ -328,7 +328,11 @@
       ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
       ctx.imageSmoothingEnabled = prevSmooth;
       ctx.restore();
+      return;
     }
+
+    ctx.fillStyle = "#0b1220";
+    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
   }
 
   function renderMap() {
@@ -336,6 +340,7 @@
     const frame = socketState.frame;
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
+    $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
     if (!socketState.room) $("map-message").textContent = "Nhập mã phòng để xem bản đồ";
     else if (!live) $("map-message").textContent = "Chờ dữ liệu từ iPhone";
