@@ -382,10 +382,11 @@
     const frame = socketState.frame;
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
+    const hasStaticMap = mapImage.complete && mapImage.naturalWidth > 0;
     setLiveBadge(live);
     background();
-    $("map-panel").classList.toggle("is-waiting", !live);
-    $("map-message").hidden = socketState.room && live;
+    $("map-panel").classList.toggle("is-waiting", !live && !hasStaticMap);
+    $("map-message").hidden = hasStaticMap || (socketState.room && live);
     if (!live) {
       setMapMessage("Chờ iPhone phát bản đồ");
     }
