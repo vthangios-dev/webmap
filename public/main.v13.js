@@ -169,8 +169,11 @@
     const entities = Array.isArray(msg?.payload?.entities)
       ? msg.payload.entities
       : [];
+    const metaCamp = Number(msg?.payload?.meta?.selfTeam || 0);
+    const selfEntity = entities.find((entity) => entity?.isSelf);
+    const inferredCamp = Number(selfEntity?.team || 0);
     return {
-      camp: Number(msg?.payload?.meta?.selfTeam || 0),
+      camp: metaCamp > 0 ? metaCamp : inferredCamp,
       actorCount: entities.length,
       entities: entities.map((entity) => ({
         id: String(entity?.id || ""),
@@ -364,20 +367,21 @@
   function drawActors(frame, enemyOnly = false) {
     if (!frame || !Array.isArray(frame.entities)) return;
     for (const actor of frame.entities) {
-      if (!actor.visible || actor.dead) continue;
-      if (enemyOnly && frame.camp > 0 && actor.team === frame.camp) continue;
+      if (actor.dead) continue;
+      if (!enemyOnly && !actor.visible) continue;
+      if (enemyOnly && (actor.isSelf || (frame.camp > 0 && actor.team === frame.camp))) continue;
       const x = Math.max(0, Math.min(1, actor.x)) * LOGICAL_MAP_SIZE;
       const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
-      const radius = self ? 10 : 7;
+      const radius = enemyOnly ? 10 : (self ? 10 : 7);
       ctx.beginPath();
-      ctx.fillStyle = self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82";
+      ctx.fillStyle = enemyOnly ? "#ff445e" : (self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82");
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(9, 14, 24, 0.85)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = enemyOnly ? "rgba(255, 235, 245, 0.95)" : "rgba(9, 14, 24, 0.85)";
+      ctx.lineWidth = enemyOnly ? 2.6 : 2;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
     }
