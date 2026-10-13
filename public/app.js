@@ -439,10 +439,12 @@
   function readURL() {
     const params = new URLSearchParams(location.search);
     let room = params.get("room") || "";
-    if (!room) {
-      const pathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
-      room = pathMatch ? pathMatch[1] : "";
-    }
+    const pathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
+    const roomFromPath = !room && pathMatch ? pathMatch[1] : "";
+    if (roomFromPath) room = roomFromPath;
+
+    const viewerMode = !!roomFromPath;
+    document.body.classList.toggle("viewer-mode", viewerMode);
     document.body.classList.toggle("compact", params.get("compact") === "1");
     setButtonText("compact", document.body.classList.contains("compact") ? "Mở rộng" : "Thu gọn");
     chooseRoom(room, false);
