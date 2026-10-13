@@ -496,7 +496,7 @@
           ? "Luồng phát đã dừng"
           : "Chưa có dữ liệu";
     if (!live) return;
-    drawActors(frame, hasLiveMapFrame);
+    if (!hasLiveMapFrame) drawActors(frame, false);
     return;
   }
 
