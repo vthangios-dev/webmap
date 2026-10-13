@@ -12,98 +12,91 @@
     <link rel="stylesheet" href="/style.__ASSET_VERSION__.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <header class="page-head">
-        <div class="brand-wrap">
+    <main class="layout">
+      <header class="topbar">
+        <div class="brand-area">
           <a href="/webmap/" class="brand">VTHANGIOS</a>
-          <p class="brand-sub">Arena of Valor · Live Tactical Minimap</p>
+          <p class="brand-sub">LIVE TACTICAL MINIMAP</p>
         </div>
-        <div class="tools">
-          <button id="compact" class="btn-icon">
+        <div class="actions">
+          <button id="compact" class="btn">
             <i class="bi bi-arrows-collapse"></i>
             <span class="btn-text">Thu gọn</span>
           </button>
-          <button id="popup" class="btn-icon">
+          <button id="popup" class="btn">
             <i class="bi bi-window-stack"></i>
-            <span class="btn-text">Cửa sổ nhỏ</span>
+            <span class="btn-text">Cửa sổ nổi</span>
           </button>
         </div>
       </header>
 
-      <section class="join">
-        <div class="join-head">
-          <h2>Kết nối trận đấu</h2>
-          <p>Nhập mã 6 ký tự lấy từ game để theo dõi minimap realtime.</p>
-        </div>
-        <form id="joinForm">
-          <label for="code">Mã phòng</label>
-          <input id="code" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}" placeholder="6 ký tự" autocomplete="off" autocapitalize="characters" required />
-          <button type="submit" class="btn-icon">
-            <i class="bi bi-eye"></i>
-            <span class="btn-text">Xem map</span>
-          </button>
-          <button type="button" id="reset-room" class="btn-icon">
-            <i class="bi bi-arrow-clockwise"></i>
-            <span class="btn-text">Đổi mã</span>
-          </button>
-        </form>
-        <p id="pair">Hiển thị minimap gốc từ game, tối ưu mượt và không render icon chồng lên bản đồ.</p>
-      </section>
+      <p id="android-pip-help" class="pip-help" hidden>
+        Android: dùng Chrome, bấm Cửa sổ nổi hoặc PiP rồi chuyển sang game.
+      </p>
 
-      <p id="android-pip-help" class="pip-help" hidden>Android: mở bằng Chrome, chọn Cửa sổ nổi / PiP rồi chuyển sang game. Nếu bị chặn, bật quyền Hình trong hình cho Chrome.</p>
-
-      <div class="battle-layout">
-        <section class="map-panel" id="map-panel">
-          <div class="map-toolbar">
-            <div class="map-title">
-              <span class="live-pill">LIVE</span>
+      <section class="dashboard">
+        <article class="viewer-card map-panel" id="map-panel">
+          <div class="viewer-head">
+            <div>
+              <span class="live-badge">LIVE</span>
               <h1>Bản đồ trực tiếp</h1>
               <p id="perspective">Chờ luồng từ iPhone</p>
             </div>
-            <div class="map-tools">
-              <button id="expand" class="expand btn-icon" title="Mở rộng">
+            <div class="viewer-tools">
+              <button id="expand" class="btn expand" title="Mở rộng">
                 <i class="bi bi-arrows-angle-expand"></i>
                 <span class="btn-text">Mở rộng</span>
               </button>
-              <button id="pip" class="btn-icon" title="Nổi trên ứng dụng">
+              <button id="pip" class="btn" title="Nổi trên ứng dụng">
                 <i class="bi bi-pip"></i>
                 <span class="btn-text">PiP</span>
               </button>
-              <button id="fullscreen" class="btn-icon" title="Toàn màn hình">
+              <button id="fullscreen" class="btn" title="Toàn màn hình">
                 <i class="bi bi-fullscreen"></i>
                 <span class="btn-text">Toàn màn hình</span>
               </button>
             </div>
           </div>
+
           <p id="notice" class="map-notice" role="status" hidden></p>
 
           <div class="map-stage">
             <canvas id="map" width="900" height="900"></canvas>
-            <div class="map-message" id="map-message">Nhập mã phòng để xem bản đồ</div>
+            <div class="map-message" id="map-message">Mở link phòng để xem bản đồ</div>
           </div>
+        </article>
 
-          <p class="map-note">Hiển thị minimap gốc từ game để xem rõ hơn và giảm giật.</p>
-        </section>
-
-        <aside>
-          <section class="session-panel">
-            <h2>Thông tin phiên</h2>
-            <dl>
-              <div><dt>Mã phòng</dt><dd id="room">—</dd></div>
-              <div><dt>Trạng thái</dt><dd id="status">Chưa kết nối</dd></div>
-              <div><dt>Kết nối web</dt><dd id="latency">RTT —</dd></div>
-              <div><dt>Bản đồ</dt><dd id="age">Chưa có dữ liệu</dd></div>
-            </dl>
-            <p class="share-label">Link share</p>
-            <code id="share-url">—</code>
-            <button id="copy-link" class="btn-icon">
-              <i class="bi bi-copy"></i>
-              <span class="btn-text">Copy Link</span>
-            </button>
-          </section>
+        <aside class="session-card">
+          <h2>Thông tin phiên</h2>
+          <dl>
+            <div><dt>Mã phòng</dt><dd id="room">—</dd></div>
+            <div><dt>Trạng thái</dt><dd id="status">Chưa kết nối</dd></div>
+            <div><dt>Kết nối web</dt><dd id="latency">RTT —</dd></div>
+            <div><dt>Bản đồ</dt><dd id="age">Chưa có dữ liệu</dd></div>
+          </dl>
+          <p class="share-label">Link share</p>
+          <code id="share-url">—</code>
+          <button id="copy-link" class="btn copy-btn">
+            <i class="bi bi-copy"></i>
+            <span class="btn-text">Copy Link</span>
+          </button>
         </aside>
-      </div>
+      </section>
+
+      <form id="joinForm" class="hidden-form" aria-hidden="true">
+        <input
+          id="code"
+          minlength="6"
+          maxlength="6"
+          pattern="[A-Za-z0-9]{6}"
+          placeholder="6 ký tự"
+          autocomplete="off"
+          autocapitalize="characters"
+        />
+        <button type="submit">Xem</button>
+        <button type="button" id="reset-room">Reset</button>
+      </form>
     </main>
     <script src="/app.__ASSET_VERSION__.js"></script>
   </body>
-  </html>
+</html>

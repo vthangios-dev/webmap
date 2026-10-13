@@ -155,7 +155,8 @@
     disconnect();
     socketState.room = sanitizeRoom(code);
     $("room").textContent = socketState.room || "—";
-    $("code").value = socketState.room;
+    const codeInput = $("code");
+    if (codeInput) codeInput.value = socketState.room;
     updateShare();
     resetFrame();
     setPerspectiveText("Chờ luồng từ iPhone");
@@ -355,16 +356,21 @@
     return;
   }
 
-  $("joinForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    chooseRoom($("code").value, true);
-  });
+  const joinForm = $("joinForm");
+  const codeInput = $("code");
+  const resetRoomButton = $("reset-room");
+  if (joinForm && codeInput && resetRoomButton) {
+    joinForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      chooseRoom(codeInput.value, true);
+    });
 
-  $("code").addEventListener("input", () => {
-    $("code").value = sanitizeRoom($("code").value);
-  });
+    codeInput.addEventListener("input", () => {
+      codeInput.value = sanitizeRoom(codeInput.value);
+    });
 
-  $("reset-room").onclick = () => chooseRoom("", true);
+    resetRoomButton.onclick = () => chooseRoom("", true);
+  }
 
   $("compact").onclick = () => {
     document.body.classList.toggle("compact");
@@ -372,11 +378,14 @@
     syncURL();
   };
 
-  $("expand").onclick = () => {
-    document.body.classList.remove("compact");
-    setButtonText("compact", "Thu gọn");
-    syncURL();
-  };
+  const expandButton = $("expand");
+  if (expandButton) {
+    expandButton.onclick = () => {
+      document.body.classList.remove("compact");
+      setButtonText("compact", "Thu gọn");
+      syncURL();
+    };
+  }
 
   $("popup").onclick = () => {
     if (mobile) {
@@ -388,7 +397,7 @@
       notice("Vào phòng trước khi mở cửa sổ nhỏ");
       return;
     }
-    const url = `/webmap/?room=${encodeURIComponent(socketState.room)}&compact=1`;
+    const url = `/webmap/${encodeURIComponent(socketState.room)}?compact=1`;
     if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
       notice("Trình duyệt đang chặn cửa sổ bật lên");
     }
