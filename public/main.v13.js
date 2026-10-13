@@ -284,7 +284,7 @@
     if (pipBusy) return;
     notice("");
     if (!socketState.room && !pipState()) {
-      notice("Nhập mã phòng và chọn Xem map trước khi mở cửa sổ nổi.");
+      notice("Nhập mã phòng trước khi mở cửa sổ nổi.");
       return;
     }
     pipBusy = true;
