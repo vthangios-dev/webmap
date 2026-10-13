@@ -388,7 +388,7 @@
           ? "rgba(72, 206, 255, 0.98)"
           : "rgba(238, 74, 92, 0.99)";
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(10, 14, 24, 0.95)";
+      ctx.strokeStyle = "rgba(12, 16, 28, 0.55)";
       ctx.lineWidth = hpLineWidth + 1.5;
       ctx.lineCap = "round";
       ctx.arc(x, y, hpRadius, 0, Math.PI * 2);
