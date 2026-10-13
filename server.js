@@ -60,6 +60,8 @@ function sanitizeEntity(entity) {
 function sanitizePayload(input) {
   const entities = Array.isArray(input.entities) ? input.entities : [];
   const selfTeam = safeNumber(input?.meta?.selfTeam, 0);
+  const minimapScaleRaw = safeNumber(input?.meta?.minimapScale, 1);
+  const minimapScale = Math.max(0.35, Math.min(3, minimapScaleRaw || 1));
   const rawFrame = input?.mapFrame;
   let mapFrame = null;
   if (rawFrame && typeof rawFrame === "object") {
@@ -85,7 +87,8 @@ function sanitizePayload(input) {
   return {
     ts: safeNumber(input.ts, nowMs()),
     meta: {
-      selfTeam
+      selfTeam,
+      minimapScale
     },
     entities: entities.map(sanitizeEntity),
     mapFrame
