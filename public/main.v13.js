@@ -30,6 +30,7 @@
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
   const heroIconCache = new Map();
+  const LIVE_ENEMY_ICON_RADIUS = 20;
 
   function clamp01(value) {
     const n = Number(value);
@@ -405,15 +406,21 @@
 
   function drawActors(frame, enemyOnly = false) {
     if (!frame || !Array.isArray(frame.entities)) return;
+    const drawnEnemyIds = enemyOnly ? new Set() : null;
     for (const actor of frame.entities) {
       if (actor.dead) continue;
       if (!enemyOnly && !actor.visible) continue;
       if (enemyOnly && (actor.isSelf || (frame.camp > 0 && actor.team === frame.camp))) continue;
+      if (enemyOnly) {
+        const dedupeKey = actor.id || `${actor.heroId}:${actor.team}:${actor.x}:${actor.y}`;
+        if (drawnEnemyIds.has(dedupeKey)) continue;
+        drawnEnemyIds.add(dedupeKey);
+      }
       const x = clamp01(actor.x) * LOGICAL_MAP_SIZE;
       const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
-      const radius = enemyOnly ? 14 : (self ? 10 : 7);
+      const radius = enemyOnly ? LIVE_ENEMY_ICON_RADIUS : (self ? 10 : 7);
 
       if (enemyOnly) {
         const icon = getHeroIcon(actor.heroId);
@@ -432,7 +439,7 @@
         }
         ctx.beginPath();
         ctx.strokeStyle = "rgba(255, 64, 92, 0.98)";
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
         ctx.stroke();
         continue;
