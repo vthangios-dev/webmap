@@ -147,7 +147,7 @@
     mapFrameDecodeBusy = false;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
-    $("latency").textContent = "RTT —";
+    $("latency").textContent = "— ms";
     renderMap();
   }
 
@@ -221,7 +221,7 @@
             if (document.hidden && pipState()) renderMap();
           } else if (payload.type === "pong" && Number.isFinite(payload.at)) {
             const rtt = performance.now() - payload.at;
-            $("latency").textContent = "RTT " + (rtt < 1 ? "<1" : Math.round(rtt)) + " ms";
+            $("latency").textContent = (rtt < 1 ? "<1" : Math.round(rtt)) + " ms";
           }
         } catch (_err) {}
       }
