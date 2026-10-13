@@ -1,15 +1,13 @@
 :root {
   color-scheme: dark;
-  --bg: #070b14;
-  --panel: rgba(17, 25, 42, 0.88);
-  --panel-strong: rgba(19, 30, 53, 0.95);
-  --line: rgba(107, 141, 193, 0.35);
-  --line-strong: rgba(116, 165, 227, 0.5);
-  --text: #e5edff;
-  --text-muted: #95a7c9;
-  --accent: #61b7ff;
-  --accent-2: #63dbd0;
-  --danger: #f06a88;
+  --bg: #050913;
+  --panel: rgba(13, 22, 40, 0.9);
+  --panel-strong: rgba(14, 24, 44, 0.96);
+  --line: rgba(123, 164, 223, 0.32);
+  --line-strong: rgba(142, 188, 255, 0.56);
+  --text: #edf3ff;
+  --text-muted: #99aed2;
+  --accent: #6cb8ff;
 }
 
 * {
@@ -21,9 +19,9 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 18% -5%, #223864 0%, transparent 38%),
-    radial-gradient(circle at 88% 105%, #1b304c 0%, transparent 42%),
-    linear-gradient(180deg, #060a13 0%, var(--bg) 100%);
+    radial-gradient(circle at 15% -10%, #1b3158 0%, transparent 40%),
+    radial-gradient(circle at 90% 115%, #152849 0%, transparent 42%),
+    linear-gradient(180deg, #050913 0%, var(--bg) 100%);
 }
 
 main {
@@ -172,10 +170,10 @@ button:disabled {
 .map-panel,
 .session-panel {
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--panel-strong);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
 }
 
 .map-panel {
@@ -266,25 +264,11 @@ canvas {
   display: none;
 }
 
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  padding: 10px 12px 12px;
-  font-size: 10px;
-  color: #8ea3c2;
-}
-
-.enemy {
-  color: var(--danger);
-}
-
-.ally {
-  color: var(--accent-2);
-}
-
-.monster {
-  color: #ddb96d;
+.map-note {
+  margin: 10px 12px 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 aside {
@@ -406,12 +390,6 @@ body.compact .map-tools .btn-icon {
 
 body.compact .map-tools .btn-icon .btn-text {
   display: none;
-}
-
-body.compact .legend {
-  gap: 10px;
-  padding: 6px 8px;
-  font-size: 8px;
 }
 
 body.compact .map-stage {

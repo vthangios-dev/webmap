@@ -14,7 +14,6 @@
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   const icons = {};
-  const heroIconCache = new Map();
   const socketState = {
     ws: null,
     retry: 0,
@@ -170,57 +169,20 @@
   }
 
   function parsePayload(msg) {
-    const entities = msg?.payload?.entities;
-    if (!Array.isArray(entities)) return null;
-    const parseHeroId = (entity) => {
-      const direct = Number(entity?.heroId);
-      if (Number.isFinite(direct) && direct > 0) return direct;
-      const nameMatch = String(entity?.name || "").match(/hero_(\d+)/i);
-      if (nameMatch) return Number(nameMatch[1]);
-      return 0;
-    };
+    const entities = Array.isArray(msg?.payload?.entities)
+      ? msg.payload.entities
+      : [];
     return {
       camp: Number(msg?.payload?.meta?.selfTeam || 0),
+      actorCount: entities.length,
       mapFrame: msg?.payload?.mapFrame && typeof msg.payload.mapFrame === "object"
         ? {
             mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
             data: String(msg.payload.mapFrame.data || ""),
             ts: Number(msg.payload.mapFrame.ts || 0)
           }
-        : null,
-      actors: entities.map((e) => ({
-        id: String(e.id || ""),
-        name: String(e.name || ""),
-        heroId: parseHeroId(e),
-        hp: Number(e.hp || 0),
-        max: Number(e.maxHp || 1),
-        x: Number(e.x || 0),
-        y: Number(e.y || 0),
-        team: Number(e.team || 0),
-        dead: Boolean(e.dead)
-      }))
+        : null
     };
-  }
-
-  function getHeroIcon(heroId) {
-    if (!Number.isFinite(heroId) || heroId <= 0) return null;
-    if (heroIconCache.has(heroId)) {
-      const cached = heroIconCache.get(heroId);
-      return cached.loaded ? cached.image : null;
-    }
-
-    const image = new Image();
-    const holder = { image, loaded: false };
-    heroIconCache.set(heroId, holder);
-    image.onload = () => {
-      holder.loaded = true;
-      renderMap();
-    };
-    image.onerror = () => {
-      heroIconCache.set(heroId, { image: null, loaded: false, failed: true });
-    };
-    image.src = `${MAP_ASSET}heroes/${heroId}.png`;
-    return null;
   }
 
   function connect(room) {
@@ -249,9 +211,13 @@
             socketState.frame = parsed;
             socketState.lastReceived = performance.now();
             updateMapFrame(parsed);
-            const count = parsed.actors.length;
+            const count = parsed.actorCount;
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
-            setPerspectiveText(parsed.camp ? `Góc nhìn Team ${parsed.camp}` : "Đang nhận dữ liệu trực tiếp");
+            setPerspectiveText(
+              parsed.camp
+                ? `Góc nhìn Team ${parsed.camp} • Không hiển thị icon`
+                : "Đang nhận minimap trực tiếp"
+            );
             $("age").textContent = "Cập nhật vài giây trước";
             renderMap();
             if (document.hidden && pipState()) renderMap();
@@ -354,10 +320,6 @@
     }
   }
 
-  function toCanvas(x01, y01) {
-    return { x: x01 * LOGICAL_MAP_SIZE, y: (1 - y01) * LOGICAL_MAP_SIZE };
-  }
-
   function background() {
     ctx.fillStyle = "#182734";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
@@ -372,47 +334,6 @@
     } else if (mapImageLoaded) {
       ctx.drawImage(icons.terrain, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     }
-  }
-
-  function drawActor(actor, camp) {
-    const p = toCanvas(actor.x, actor.y);
-    const ally = camp && actor.team === camp;
-    const color = ally ? "#5acbde" : "#e9797d";
-    const heroIcon = getHeroIcon(actor.heroId);
-
-    ctx.globalAlpha = actor.dead ? 0.35 : 1;
-    if (heroIcon) {
-      const size = 26;
-      const half = size / 2;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, half, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(heroIcon, p.x - half, p.y - half, size, size);
-      ctx.restore();
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, half + 2, 0, Math.PI * 2);
-      ctx.strokeStyle = ally ? "#86ecff" : "#ff9ca0";
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-    } else {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(255,255,255,.85)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-
-    const rate = Math.max(0, Math.min(1, actor.hp / Math.max(1, actor.max)));
-    ctx.fillStyle = "#16151fcc";
-    ctx.fillRect(p.x - 20, p.y - 18, 40, 5);
-    ctx.fillStyle = ally ? "#63cbdc" : "#e37d81";
-    ctx.fillRect(p.x - 20, p.y - 18, 40 * rate, 5);
-    ctx.globalAlpha = 1;
   }
 
   function renderMap() {
@@ -431,10 +352,7 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
-    if (socketState.mapFrameImage) return;
-    for (const actor of frame.actors) {
-      drawActor(actor, frame.camp);
-    }
+    return;
   }
 
   $("joinForm").addEventListener("submit", (e) => {
