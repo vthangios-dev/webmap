@@ -245,15 +245,15 @@
 
   function pipVideo() {
     if (video) return video;
-    video = document.createElement("video");
-    video.id = "pip-video";
+    video = $("pip-video") || document.createElement("video");
+    if (!video.id) video.id = "pip-video";
     video.muted = true;
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.setAttribute("aria-hidden", "true");
     video.tabIndex = -1;
-    document.body.append(video);
+    if (!video.parentNode) document.body.append(video);
     return video;
   }
 
@@ -300,13 +300,13 @@
           v.webkitSetPresentationMode("inline");
         }
       } else {
-        const stream = canvas.captureStream(60);
+        const stream = canvas.captureStream(30);
         if (v.srcObject !== stream) v.srcObject = stream;
         await v.play();
-        if (v.requestPictureInPicture) {
-          await v.requestPictureInPicture();
-        } else if (v.webkitSupportsPresentationMode?.("picture-in-picture")) {
+        if (v.webkitSupportsPresentationMode?.("picture-in-picture")) {
           v.webkitSetPresentationMode("picture-in-picture");
+        } else if (v.requestPictureInPicture) {
+          await v.requestPictureInPicture();
         } else {
           notice("Trình duyệt chưa hỗ trợ PiP.");
         }
