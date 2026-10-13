@@ -229,11 +229,14 @@
             updateMapFrame(parsed);
             const count = parsed.actorCount;
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
-            setPerspectiveText(
-              parsed.camp
-                ? `Góc nhìn Team ${parsed.camp} • Minimap render dữ liệu`
-                : "Đang nhận minimap realtime"
-            );
+            const hasLiveFrame = !!parsed.mapFrame?.data;
+            setPerspectiveText(hasLiveFrame
+              ? (parsed.camp
+                  ? `Góc nhìn Team ${parsed.camp} • Minimap trực tiếp từ game`
+                  : "Đang nhận minimap trực tiếp")
+              : (parsed.camp
+                  ? `Góc nhìn Team ${parsed.camp} • Minimap render dữ liệu`
+                  : "Đang nhận minimap realtime"));
             $("age").textContent = "Cập nhật vài giây trước";
             renderMap();
             if (document.hidden && pipState()) renderMap();
@@ -293,7 +296,7 @@
       setButtonText("popup", open ? "Đóng cửa sổ nổi" : "Cửa sổ nổi");
       $("popup").setAttribute("aria-pressed", String(open));
     }
-    if (open) pipTimer = setInterval(renderMap, 33);
+    if (open) pipTimer = setInterval(renderMap, 16);
   }
 
   async function togglePip() {
@@ -315,7 +318,7 @@
           v.webkitSetPresentationMode("inline");
         }
       } else {
-        const stream = canvas.captureStream(30);
+        const stream = canvas.captureStream(60);
         if (v.srcObject !== stream) v.srcObject = stream;
         await v.play();
         if (v.requestPictureInPicture) {
@@ -430,6 +433,7 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
+    if (socketState.mapFrameImage) return;
     drawActors(frame);
     return;
   }
