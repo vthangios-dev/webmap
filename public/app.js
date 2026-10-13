@@ -4,6 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const canvas = $("map");
   const ctx = canvas.getContext("2d");
+  const LOGICAL_MAP_SIZE = 900;
   const MAP_ASSET = "/assets/";
 
   const android = /Android/i.test(navigator.userAgent);
@@ -28,6 +29,21 @@
   let pipTimer = 0;
   let pipBusy = false;
   let mapImageLoaded = false;
+  let canvasScale = 1;
+
+  function setupCanvasResolution() {
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    if (dpr === canvasScale) return;
+    canvasScale = dpr;
+    canvas.width = Math.round(LOGICAL_MAP_SIZE * dpr);
+    canvas.height = Math.round(LOGICAL_MAP_SIZE * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    if ("imageSmoothingQuality" in ctx) {
+      ctx.imageSmoothingQuality = "high";
+    }
+    renderMap();
+  }
 
   function status(text) {
     $("status").textContent = text;
@@ -311,16 +327,19 @@
   }
 
   function toCanvas(x01, y01) {
-    return { x: x01 * 900, y: (1 - y01) * 900 };
+    return { x: x01 * LOGICAL_MAP_SIZE, y: (1 - y01) * LOGICAL_MAP_SIZE };
   }
 
   function background() {
     ctx.fillStyle = "#182734";
-    ctx.fillRect(0, 0, 900, 900);
+    ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     if (socketState.mapFrameImage) {
-      ctx.drawImage(socketState.mapFrameImage, 0, 0, 900, 900);
+      ctx.save();
+      ctx.filter = "contrast(1.16) saturate(1.12) brightness(1.06)";
+      ctx.drawImage(socketState.mapFrameImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+      ctx.restore();
     } else if (mapImageLoaded) {
-      ctx.drawImage(icons.terrain, 0, 0, 900, 900);
+      ctx.drawImage(icons.terrain, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
     }
   }
 
@@ -471,6 +490,8 @@
     }
   });
 
+  addEventListener("resize", setupCanvasResolution);
+
   function readURL() {
     const params = new URLSearchParams(location.search);
     let room = params.get("room") || "";
@@ -509,6 +530,7 @@
     renderMap();
   }, 2000);
 
+  setupCanvasResolution();
   readURL();
   updateShare();
   syncPipButton();
