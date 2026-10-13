@@ -29,6 +29,19 @@
   let pipBusy = false;
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
+  const heroIconCache = new Map();
+
+  function getHeroIcon(heroId) {
+    if (!heroId) return null;
+    const key = String(heroId);
+    let img = heroIconCache.get(key);
+    if (!img) {
+      img = new Image();
+      img.src = `/assets/heroes/${encodeURIComponent(key)}.png`;
+      heroIconCache.set(key, img);
+    }
+    return img;
+  }
 
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -177,6 +190,7 @@
       actorCount: entities.length,
       entities: entities.map((entity) => ({
         id: String(entity?.id || ""),
+        heroId: Number(entity?.heroId || 0),
         team: Number(entity?.team || 0),
         x: Number(entity?.x || 0),
         y: Number(entity?.y || 0),
@@ -374,14 +388,38 @@
       const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
-      const radius = enemyOnly ? 10 : (self ? 10 : 7);
+      const radius = enemyOnly ? 14 : (self ? 10 : 7);
+
+      if (enemyOnly) {
+        const icon = getHeroIcon(actor.heroId);
+        if (icon?.complete && icon.naturalWidth > 0) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(icon, x - radius, y - radius, radius * 2, radius * 2);
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.fillStyle = "#ff445e";
+          ctx.arc(x, y, radius - 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(255, 64, 92, 0.98)";
+        ctx.lineWidth = 3;
+        ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
+        ctx.stroke();
+        continue;
+      }
+
       ctx.beginPath();
-      ctx.fillStyle = enemyOnly ? "#ff445e" : (self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82");
+      ctx.fillStyle = self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82";
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.strokeStyle = enemyOnly ? "rgba(255, 235, 245, 0.95)" : "rgba(9, 14, 24, 0.85)";
-      ctx.lineWidth = enemyOnly ? 2.6 : 2;
+      ctx.strokeStyle = "rgba(9, 14, 24, 0.85)";
+      ctx.lineWidth = 2;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
     }
