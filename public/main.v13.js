@@ -300,8 +300,11 @@
           v.webkitSetPresentationMode("inline");
         }
       } else {
+        renderMap();
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
         const stream = canvas.captureStream(30);
         if (v.srcObject !== stream) v.srcObject = stream;
+        v.autoplay = true;
         await v.play();
         if (v.webkitSupportsPresentationMode?.("picture-in-picture")) {
           v.webkitSetPresentationMode("picture-in-picture");

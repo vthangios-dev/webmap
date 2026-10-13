@@ -365,11 +365,11 @@ code {
 }
 
 #pip-video {
-  position: fixed;
-  right: -9999px;
-  bottom: -9999px;
-  width: 160px;
-  height: 90px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
   opacity: 0.01;
   pointer-events: none;
 }
