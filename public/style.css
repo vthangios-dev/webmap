@@ -1,18 +1,17 @@
 :root {
-  color-scheme: dark;
-  --bg: #060b17;
-  --bg-soft: #0c1426;
-  --panel: rgba(11, 19, 35, 0.92);
-  --panel-strong: rgba(10, 18, 34, 0.98);
-  --line: rgba(126, 156, 210, 0.28);
-  --line-strong: rgba(142, 186, 255, 0.58);
-  --text: #eff5ff;
-  --text-muted: #9caece;
-  --brand: #91bfff;
-  --accent: #5ea9ff;
-  --accent-strong: #3f8ff0;
-  --warning: #f3cd85;
-  --ok: #9ce0cf;
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --surface-soft: #f8faff;
+  --line: #dbe4f1;
+  --line-strong: #b7c8e2;
+  --text: #0f1b2d;
+  --text-muted: #60708c;
+  --primary: #2563eb;
+  --primary-strong: #1e4fc2;
+  --ok: #0f8a66;
+  --warn-bg: #fff7e8;
+  --warn-line: #f1d6a1;
+  --warn-text: #8a5a00;
 }
 
 * {
@@ -25,43 +24,42 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 12% -12%, #1e3865 0%, transparent 42%),
-    radial-gradient(circle at 92% 120%, #172d52 0%, transparent 40%),
-    linear-gradient(180deg, #050913 0%, var(--bg) 100%);
+    radial-gradient(circle at 8% -15%, #dae9ff 0%, transparent 34%),
+    radial-gradient(circle at 96% 118%, #eaf2ff 0%, transparent 38%),
+    var(--bg);
 }
 
 .app-shell {
   max-width: 1220px;
   margin: 0 auto;
-  padding: 28px 20px 22px;
+  padding: 28px 20px 24px;
 }
 
 .page-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 18px;
 }
 
 .brand-wrap {
   display: grid;
-  gap: 5px;
+  gap: 6px;
 }
 
 .brand {
-  color: var(--brand);
   text-decoration: none;
+  color: #1143a6;
+  font-size: 20px;
   font-weight: 800;
-  font-size: 18px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .brand-sub {
   margin: 0;
   color: var(--text-muted);
   font-size: 12px;
-  letter-spacing: 0.04em;
 }
 
 .tools,
@@ -79,23 +77,24 @@ input {
 }
 
 button {
-  background: linear-gradient(180deg, #1a2944 0%, #132036 100%);
+  background: var(--surface);
   padding: 9px 13px;
-  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
   cursor: pointer;
+  transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
 
 button:hover,
 button:focus-visible {
   border-color: var(--line-strong);
-  background: linear-gradient(180deg, #213558 0%, #172844 100%);
   transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(22, 47, 97, 0.12);
 }
 
 button:disabled {
-  opacity: 0.58;
+  opacity: 0.55;
   cursor: default;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-icon {
@@ -107,37 +106,35 @@ button:disabled {
 
 .btn-icon i {
   line-height: 1;
-  font-size: 14px;
 }
 
-.tools .btn-icon {
-  font-size: 12px;
+.join,
+.map-panel,
+.session-panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 20px 44px rgba(24, 53, 103, 0.08);
 }
 
 .join {
   margin-bottom: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.3);
+  padding: 15px;
 }
 
 .join-head {
-  margin-bottom: 11px;
+  margin-bottom: 12px;
 }
 
 .join-head h2 {
   margin: 0;
-  font-size: 15px;
-  letter-spacing: 0.02em;
+  font-size: 16px;
 }
 
 .join-head p {
   margin: 5px 0 0;
-  font-size: 12px;
   color: var(--text-muted);
+  font-size: 12px;
 }
 
 .join form {
@@ -154,32 +151,37 @@ button:disabled {
 
 .join input {
   width: 150px;
-  padding: 11px 13px;
-  background: rgba(12, 19, 34, 0.95);
+  padding: 10px 12px;
+  background: var(--surface-soft);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 16px;
 }
 
 .join form button {
-  border-color: rgba(113, 176, 255, 0.45);
-  background: linear-gradient(180deg, #2a5a99 0%, #1d4373 100%);
+  border-color: #adc4ed;
+  background: #edf3ff;
+}
+
+.join form button[type="submit"] {
+  color: #fff;
+  border-color: #2a66e9;
+  background: linear-gradient(180deg, #2f74ff 0%, #2765de 100%);
 }
 
 #pair {
   margin: 10px 0 0;
-  color: #9cb0d2;
+  color: var(--text-muted);
   font-size: 12px;
-  line-height: 1.5;
 }
 
 .pip-help {
   margin: 0 0 13px;
   padding: 9px 11px;
-  border: 1px solid rgba(129, 165, 226, 0.28);
+  border: 1px solid #d6e2f4;
   border-radius: 10px;
-  background: rgba(11, 20, 35, 0.7);
-  color: #a7bcdd;
+  background: #f6f9ff;
+  color: #4f6488;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -193,15 +195,6 @@ button:disabled {
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 16px;
   align-items: start;
-}
-
-.map-panel,
-.session-panel {
-  overflow: hidden;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: var(--panel-strong);
-  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.34);
 }
 
 .map-toolbar {
@@ -221,20 +214,19 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(133, 190, 255, 0.38);
-  background: rgba(24, 48, 82, 0.6);
-  color: #cde6ff;
+  border: 1px solid #cde0ff;
+  background: #edf4ff;
+  color: #1f5ccc;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .map-toolbar h1 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
 }
 
 .map-toolbar p {
@@ -246,8 +238,8 @@ button:disabled {
 .map-tools .btn-icon {
   min-height: 34px;
   min-width: 36px;
-  padding: 0 9px;
-  font-size: 11px;
+  padding: 0 10px;
+  font-size: 12px;
 }
 
 .expand {
@@ -255,14 +247,13 @@ button:disabled {
 }
 
 .map-notice {
-  margin: 0 10px 10px;
+  margin: 0 12px 10px;
   padding: 9px 10px;
-  border-radius: 9px;
-  background: rgba(58, 45, 25, 0.76);
-  border: 1px solid rgba(208, 160, 81, 0.34);
-  color: var(--warning);
+  border-radius: 10px;
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  color: var(--warn-text);
   font-size: 11px;
-  line-height: 1.45;
 }
 
 .map-notice[hidden] {
@@ -271,11 +262,10 @@ button:disabled {
 
 .map-stage {
   position: relative;
-  margin: 0 10px;
+  margin: 0 12px;
+  border: 1px solid #cad9ef;
   border-radius: 12px;
-  border: 1px solid rgba(106, 139, 192, 0.36);
-  background: #0c1425;
-  box-shadow: inset 0 0 0 2px rgba(20, 35, 58, 0.88);
+  background: #eff4fd;
 }
 
 canvas {
@@ -295,8 +285,8 @@ canvas {
   justify-content: center;
   padding: 30px;
   text-align: center;
-  background: rgba(7, 12, 22, 0.58);
-  color: #bfd3f1;
+  background: rgba(236, 244, 255, 0.76);
+  color: #45618d;
   font-size: 13px;
   pointer-events: none;
 }
@@ -309,7 +299,6 @@ canvas {
   margin: 11px 14px 13px;
   color: var(--text-muted);
   font-size: 12px;
-  line-height: 1.48;
 }
 
 .session-panel {
@@ -318,8 +307,7 @@ canvas {
 
 .session-panel h2 {
   margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
 }
 
 dl {
@@ -331,8 +319,8 @@ dl div {
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  padding: 7px 0;
-  border-bottom: 1px dashed rgba(119, 146, 196, 0.24);
+  padding: 8px 0;
+  border-bottom: 1px dashed #d7e2f2;
   font-size: 12px;
 }
 
@@ -352,8 +340,8 @@ dd {
 }
 
 #room {
-  color: #ead297;
   letter-spacing: 0.12em;
+  color: #b3790d;
 }
 
 #latency {
@@ -369,17 +357,16 @@ dd {
 code {
   display: block;
   padding: 9px;
+  border: 1px solid #d3e0f3;
   border-radius: 10px;
-  border: 1px solid rgba(110, 143, 195, 0.34);
-  background: rgba(9, 15, 27, 0.96);
-  color: #ccdaf1;
+  background: #f7faff;
+  color: #2b4168;
   font-size: 11px;
   word-break: break-all;
 }
 
 #copy-link {
   margin-top: 9px;
-  font-size: 11px;
 }
 
 #pip-video {
@@ -469,12 +456,8 @@ body.compact .map-notice {
     padding: 13px;
   }
 
-  .page-head {
-    margin-bottom: 12px;
-  }
-
   .brand {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .brand-sub {
@@ -491,14 +474,6 @@ body.compact .map-notice {
 
   .map-panel {
     margin-bottom: 14px;
-  }
-
-  .map-toolbar h1 {
-    font-size: 14px;
-  }
-
-  .map-toolbar p {
-    font-size: 11px;
   }
 
   .map-tools .btn-text,
