@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>map.vthangios.xyz - Webmap</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main>
+      <header class="page-head">
+        <a class="brand" href="/webmap/">✦ VTHANGIOS <span>WEB MAP</span></a>
+        <div class="head-tools">
+          <button id="compactBtn" type="button">Thu gọn</button>
+          <button id="popupBtn" type="button">Cửa sổ nhỏ</button>
+        </div>
+      </header>
+
+      <section class="join">
+        <form id="joinForm">
+          <label for="mapCodeInput">Mã phòng</label>
+          <input
+            id="mapCodeInput"
+            minlength="6"
+            maxlength="6"
+            pattern="[A-Za-z0-9]{6}"
+            placeholder="6 ký tự"
+            autocomplete="off"
+            autocapitalize="characters"
+            required
+          />
+          <button id="joinMapBtn" type="submit">Xem map</button>
+          <button id="resetBtn" type="button">Đổi mã</button>
+        </form>
+        <p class="hint">Trong game tạo mã map rồi đưa cho người xem nhập tại đây.</p>
+      </section>
+
+      <div id="battleLayout" class="battle-layout">
+        <section class="map-panel">
+          <div class="map-toolbar">
+            <div>
+              <h1>Bản đồ trực tiếp</h1>
+              <p id="perspective">Chờ luồng từ iPhone</p>
+            </div>
+            <div class="map-tools">
+              <button id="fullscreenBtn" title="Toàn màn hình" aria-label="Toàn màn hình">⛶</button>
+            </div>
+          </div>
+
+          <div class="map-stage">
+            <canvas id="mapCanvas" width="900" height="900"></canvas>
+            <div id="emptyOverlay" class="map-message">Nhập mã phòng để xem bản đồ</div>
+          </div>
+
+          <div class="legend">
+            <span class="enemy">● Màu địch</span>
+            <span class="ally">● Màu đồng minh</span>
+            <span class="monster">◆ Khác</span>
+          </div>
+        </section>
+
+        <aside id="sidePanel" class="side-panel">
+          <section class="card">
+            <h2>Thông tin phiên</h2>
+            <dl>
+              <div><dt>Mã phòng</dt><dd id="roomValue">—</dd></div>
+              <div><dt>Trạng thái</dt><dd><span id="wsDot" class="dot off"></span> <span id="wsStatus">Chưa kết nối</span></dd></div>
+              <div><dt>Bản đồ</dt><dd id="updatedAt">Chưa có dữ liệu</dd></div>
+              <div><dt>Đối tượng</dt><dd id="countInfo">0</dd></div>
+            </dl>
+            <p class="hint">Link share:</p>
+            <code id="shareUrl"></code>
+            <button id="copyLinkBtn" type="button">Copy Link</button>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <section id="floatingPanel" class="floating-panel">
+      <div id="floatingHeader" class="floating-header">
+        <strong>Cửa sổ nổi</strong>
+        <button id="toggleFloatingBtn" type="button">Thu gọn</button>
+      </div>
+      <div id="floatingBody" class="floating-body">
+        <p id="floatMatch">Mã map: -</p>
+        <p id="floatStatus">WS: -</p>
+        <p id="floatCount">Đối tượng: 0</p>
+      </div>
+    </section>
+
+    <script src="/app.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,16 @@
+{
+  "name": "map-vthangios-xyz-webmap",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Realtime webmap server for map.vthangios.xyz",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "ws": "^8.18.0"
+  }
+}
