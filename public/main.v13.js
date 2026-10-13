@@ -27,8 +27,17 @@
   let canvasScale = 1;
   const heroIconCache = new Map();
   const mapImage = new Image();
+  let mapImageRetried = false;
   mapImage.onload = () => renderMap();
-  mapImage.src = "/assets/icons/map.png";
+  mapImage.onerror = () => {
+    if (!mapImageRetried) {
+      mapImageRetried = true;
+      mapImage.src = "/assets/icons/map.png";
+      return;
+    }
+    renderMap();
+  };
+  mapImage.src = "/assets/icons/map.png?v=20261014";
 
   function clamp01(value) {
     const n = Number(value);
