@@ -76,8 +76,8 @@ Khuyến nghị dùng reverse proxy (Nginx/Caddy) trỏ về app Node:
 Viewer link production:
 
 - `https://map.vthangios.xyz/`
-- `https://map.vthangios.xyz/webmap`
-- `https://map.vthangios.xyz/webmap/<matchId>`
+- `https://map.vthangios.xyz/<matchId>`
+- `https://map.vthangios.xyz/webmap/<matchId>` (legacy, vẫn hỗ trợ)
 
 ## 5) Cache bust thủ công (đổi tên file)
 
