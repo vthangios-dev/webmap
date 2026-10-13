@@ -352,6 +352,7 @@
       const y = (1 - clamp01(actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
       const self = actor.isSelf;
+      const hpRate = clamp01(actor.hp / Math.max(1, actor.maxHp));
       const radius = self ? Math.round(ESP_ICON_SIZE * 0.58) : Math.round(ESP_ICON_SIZE * 0.53);
       const icon = getHeroIcon(actor.heroId);
       if (icon?.complete && icon.naturalWidth > 0) {
@@ -375,10 +376,23 @@
         ctx.fill();
       }
       ctx.beginPath();
-      ctx.strokeStyle = self ? "#8dff3a" : ally ? "rgba(79, 196, 255, 0.95)" : "rgba(255, 68, 94, 0.98)";
+      const hpColor = hpRate > 0.65
+        ? "rgba(80, 235, 126, 0.98)"
+        : hpRate > 0.35
+          ? "rgba(255, 211, 92, 0.98)"
+          : "rgba(255, 82, 96, 0.99)";
+      ctx.strokeStyle = hpColor;
       ctx.lineWidth = self ? 6 : 5;
       ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
       ctx.stroke();
+
+      if (self) {
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(141, 255, 58, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.arc(x, y, radius + 8, 0, Math.PI * 2);
+        ctx.stroke();
+      }
 
       if (actor.recalling) {
         const pulse = 0.5 + 0.5 * Math.sin(now / 160);
