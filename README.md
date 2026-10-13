@@ -16,9 +16,9 @@ npm install
 npm run dev
 ```
 
-- Health check: `http://localhost:3000/health`
-- Viewer URL: `http://localhost:3000/`
-- Hoặc vào `http://localhost:3000/webmap` rồi nhập **mã map** trên giao diện (mã này tạo từ menu app)
+- Health check: `http://localhost:3016/health`
+- Viewer URL: `http://localhost:3016/`
+- Hoặc vào `http://localhost:3016/webmap` rồi nhập **mã map** trên giao diện (mã này tạo từ menu app)
 
 ## 3) API ingest realtime
 
@@ -47,7 +47,7 @@ Body mẫu:
 Test nhanh:
 
 ```bash
-curl -X POST "http://localhost:3000/api/ingest/test-match" \
+curl -X POST "http://localhost:3016/api/ingest/test-match" \
   -H "Content-Type: application/json" \
   -H "x-map-token: change-me" \
   -d '{"ts":1728838800000,"meta":{"selfTeam":1},"entities":[{"id":"self","name":"Me","team":1,"x":0.22,"y":0.44,"hp":9450,"maxHp":9450,"dead":false},{"id":"enemy-1","name":"Enemy A","team":2,"x":0.61,"y":0.52,"hp":5100,"maxHp":7000,"dead":false}]}'
@@ -58,7 +58,7 @@ curl -X POST "http://localhost:3000/api/ingest/test-match" \
 
 Khuyến nghị dùng reverse proxy (Nginx/Caddy) trỏ về app Node:
 
-- app chạy cổng nội bộ `3000`
+- app chạy cổng nội bộ `3016`
 - domain public `map.vthangios.xyz`
 - bật hỗ trợ WebSocket upgrade (`/ws`)
 
