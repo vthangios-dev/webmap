@@ -29,6 +29,13 @@
   let pipBusy = false;
   let canvasScale = 1;
   let mapFrameDecodeBusy = false;
+  const terrainImage = new Image();
+  let terrainReady = false;
+  terrainImage.onload = () => {
+    terrainReady = true;
+    renderMap();
+  };
+  terrainImage.src = "/assets/icons/terrain.png";
 
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -173,6 +180,17 @@
     return {
       camp: Number(msg?.payload?.meta?.selfTeam || 0),
       actorCount: entities.length,
+      entities: entities.map((entity) => ({
+        id: String(entity?.id || ""),
+        team: Number(entity?.team || 0),
+        x: Number(entity?.x || 0),
+        y: Number(entity?.y || 0),
+        hp: Number(entity?.hp || 0),
+        maxHp: Number(entity?.maxHp || 1),
+        dead: !!entity?.dead,
+        visible: entity?.visible !== false,
+        isSelf: !!entity?.isSelf
+      })),
       mapFrame: msg?.payload?.mapFrame && typeof msg.payload.mapFrame === "object"
         ? {
             mime: String(msg.payload.mapFrame.mime || "image/jpeg"),
@@ -213,8 +231,8 @@
             status(count ? "Đang phát dữ liệu" : "Đã kết nối, chờ trận");
             setPerspectiveText(
               parsed.camp
-                ? `Góc nhìn Team ${parsed.camp} • Không hiển thị icon`
-                : "Đang nhận minimap trực tiếp"
+                ? `Góc nhìn Team ${parsed.camp} • Minimap render dữ liệu`
+                : "Đang nhận minimap realtime"
             );
             $("age").textContent = "Cập nhật vài giây trước";
             renderMap();
@@ -334,6 +352,47 @@
 
     ctx.fillStyle = "#0b1220";
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+    if (terrainReady) {
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(terrainImage, 0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
+      ctx.restore();
+      return;
+    }
+    const cell = 44;
+    ctx.strokeStyle = "rgba(166, 194, 232, 0.16)";
+    ctx.lineWidth = 1;
+    for (let p = 0; p <= LOGICAL_MAP_SIZE; p += cell) {
+      ctx.beginPath();
+      ctx.moveTo(p, 0);
+      ctx.lineTo(p, LOGICAL_MAP_SIZE);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, p);
+      ctx.lineTo(LOGICAL_MAP_SIZE, p);
+      ctx.stroke();
+    }
+  }
+
+  function drawActors(frame) {
+    if (!frame || !Array.isArray(frame.entities)) return;
+    for (const actor of frame.entities) {
+      if (!actor.visible || actor.dead) continue;
+      const x = Math.max(0, Math.min(1, actor.x)) * LOGICAL_MAP_SIZE;
+      const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
+      const ally = actor.team === frame.camp;
+      const self = actor.isSelf;
+      const radius = self ? 10 : 7;
+      ctx.beginPath();
+      ctx.fillStyle = self ? "#ffd36a" : ally ? "#47d9a3" : "#ff6e82";
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(9, 14, 24, 0.85)";
+      ctx.lineWidth = 2;
+      ctx.arc(x, y, radius + 1, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 
   function setMapMessage(text) {
@@ -371,6 +430,7 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
+    drawActors(frame);
     return;
   }
 
