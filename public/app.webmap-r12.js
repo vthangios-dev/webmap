@@ -318,8 +318,8 @@
     }
   }
 
-  function background() {
-    if (socketState.mapFrameImage) {
+  function background(showLiveFrame) {
+    if (showLiveFrame && socketState.mapFrameImage) {
       ctx.fillStyle = "#0b1220";
       ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
       ctx.save();
@@ -336,15 +336,33 @@
     ctx.fillRect(0, 0, LOGICAL_MAP_SIZE, LOGICAL_MAP_SIZE);
   }
 
+  function setMapMessage(text) {
+    const message = $("map-message");
+    if (!message) return;
+    message.textContent = text;
+  }
+
+  function setLiveBadge(isLive) {
+    const badge = document.querySelector(".status-live");
+    if (!badge) return;
+    badge.classList.toggle("offline", !isLive);
+    badge.classList.toggle("online", isLive);
+    badge.innerHTML = isLive
+      ? '<i class="bi bi-broadcast-pin"></i> ONLINE'
+      : '<i class="bi bi-broadcast-pin"></i> OFFLINE';
+  }
+
   function renderMap() {
-    background();
     const frame = socketState.frame;
     const age = socketState.lastReceived ? performance.now() - socketState.lastReceived : Infinity;
     const live = !!frame && age < 3000;
+    setLiveBadge(live);
+    background(live);
     $("map-panel").classList.toggle("is-waiting", !live);
     $("map-message").hidden = socketState.room && live;
-    if (!socketState.room) $("map-message").textContent = "Mở link phòng để xem bản đồ";
-    else if (!live) $("map-message").textContent = "Chờ dữ liệu từ iPhone";
+    if (!live) {
+      setMapMessage("Chờ iPhone phát bản đồ");
+    }
     $("age").textContent =
       socketState.lastReceived && age < 3000
         ? "Cập nhật " + Math.round(age) + " ms trước"

@@ -79,16 +79,15 @@ Viewer link production:
 - `https://map.vthangios.xyz/webmap`
 - `https://map.vthangios.xyz/webmap/<matchId>`
 
-## 5) Cache bust tự động
+## 5) Cache bust thủ công (đổi tên file)
 
-- `index.html` được render động với version token cho CSS/JS:
-  - `/style.<version>.css`
-  - `/app.<version>.js`
-- Mặc định `version = Date.now()` lúc server start.
-- Có thể set thủ công:
+Project đang dùng chế độ **manual filename** cho asset:
 
-```bash
-ASSET_VERSION=20261014-001 npm start
-```
+- CSS: `/style.webmap-r3.css`
+- JS: `/app.webmap-r3.js`
 
-Sau mỗi deploy/restart, URL asset đổi nên tránh cache cũ của trình duyệt.
+Khi sửa frontend và muốn chắc chắn trình duyệt không dùng cache cũ:
+
+1. Đổi tên file CSS/JS trong thư mục `public/` (ví dụ `style.webmap-r3.css`, `app.webmap-r3.js`)
+2. Sửa lại 2 đường dẫn tương ứng trong `public/index.html`
+3. Restart server

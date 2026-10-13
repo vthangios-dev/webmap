@@ -9,7 +9,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <link rel="stylesheet" href="/style.__ASSET_VERSION__.css" />
+    <link rel="stylesheet" href="/style.webmap-r12.css" />
   </head>
   <body>
     <main class="shell">
@@ -38,7 +38,7 @@
         <article id="map-panel" class="arena map-panel">
           <div class="arena-top">
             <div class="arena-meta">
-              <span class="status-live"><i class="bi bi-broadcast-pin"></i> LIVE TRACK</span>
+              <span class="status-live offline"><i class="bi bi-broadcast-pin"></i> OFFLINE</span>
               <h1>Realtime Map Feed</h1>
               <p id="perspective">Chờ luồng từ iPhone</p>
             </div>
@@ -62,7 +62,7 @@
 
           <div class="frame">
             <canvas id="map" width="900" height="900"></canvas>
-            <div class="map-message" id="map-message">Mở link phòng để xem bản đồ</div>
+            <div class="map-message" id="map-message">Chờ iPhone phát bản đồ</div>
           </div>
         </article>
 
@@ -97,6 +97,6 @@
         <button type="button" id="reset-room">Reset</button>
       </form>
     </main>
-    <script src="/app.__ASSET_VERSION__.js"></script>
+    <script src="/app.webmap-r12.js"></script>
   </body>
 </html>
