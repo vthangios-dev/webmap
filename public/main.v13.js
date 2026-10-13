@@ -361,10 +361,11 @@
     }
   }
 
-  function drawActors(frame) {
+  function drawActors(frame, enemyOnly = false) {
     if (!frame || !Array.isArray(frame.entities)) return;
     for (const actor of frame.entities) {
       if (!actor.visible || actor.dead) continue;
+      if (enemyOnly && frame.camp > 0 && actor.team === frame.camp) continue;
       const x = Math.max(0, Math.min(1, actor.x)) * LOGICAL_MAP_SIZE;
       const y = Math.max(0, Math.min(1, actor.y)) * LOGICAL_MAP_SIZE;
       const ally = actor.team === frame.camp;
@@ -417,8 +418,8 @@
           : "Chưa có dữ liệu";
 
     if (!live) return;
-    if (socketState.mapFrameImage) return;
-    drawActors(frame);
+    const hasLiveMapFrame = !!socketState.mapFrameImage;
+    drawActors(frame, hasLiveMapFrame);
     return;
   }
 
