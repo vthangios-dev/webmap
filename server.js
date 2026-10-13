@@ -1,5 +1,6 @@
 const path = require("path");
 const http = require("http");
+const fs = require("fs");
 const express = require("express");
 const { WebSocketServer } = require("ws");
 const dotenv = require("dotenv");
@@ -7,11 +8,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const PORT = Number(process.env.PORT || 3016);
+const ASSET_VERSION =
+  String(process.env.ASSET_VERSION || Date.now()).replace(/[^a-zA-Z0-9_-]/g, "");
+const PUBLIC_DIR = path.join(__dirname, "public");
+const INDEX_TEMPLATE_PATH = path.join(PUBLIC_DIR, "index.html");
+const INDEX_TEMPLATE = fs.readFileSync(INDEX_TEMPLATE_PATH, "utf8");
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(PUBLIC_DIR));
 
 const latestByMatch = new Map();
 const socketsByMatch = new Map();
@@ -108,16 +114,33 @@ app.get("/health", (_req, res) => {
   res.json({
     ok: true,
     now: nowMs(),
-    activeMatches: latestByMatch.size
+    activeMatches: latestByMatch.size,
+    assetVersion: ASSET_VERSION
   });
 });
 
+function renderIndex(res) {
+  const html = INDEX_TEMPLATE.replace(/__ASSET_VERSION__/g, ASSET_VERSION);
+  res.setHeader("Cache-Control", "no-store, must-revalidate");
+  res.type("html").send(html);
+}
+
+app.get("/style.:version.css", (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.sendFile(path.join(PUBLIC_DIR, "style.css"));
+});
+
+app.get("/app.:version.js", (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.sendFile(path.join(PUBLIC_DIR, "app.js"));
+});
+
 app.get("/webmap/:matchId", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  renderIndex(res);
 });
 
 app.get("/webmap", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  renderIndex(res);
 });
 
 app.post("/api/ingest/:matchId", (req, res) => {
@@ -200,5 +223,6 @@ wss.on("connection", (ws, req) => {
 
 server.listen(PORT, () => {
   console.log(`Webmap server listening on :${PORT}`);
+  console.log(`Asset version: ${ASSET_VERSION}`);
   console.log("Ingest auth: OFF (no token required)");
 });

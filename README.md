@@ -78,3 +78,17 @@ Viewer link production:
 - `https://map.vthangios.xyz/`
 - `https://map.vthangios.xyz/webmap`
 - `https://map.vthangios.xyz/webmap/<matchId>`
+
+## 5) Cache bust tự động
+
+- `index.html` được render động với version token cho CSS/JS:
+  - `/style.<version>.css`
+  - `/app.<version>.js`
+- Mặc định `version = Date.now()` lúc server start.
+- Có thể set thủ công:
+
+```bash
+ASSET_VERSION=20261014-001 npm start
+```
+
+Sau mỗi deploy/restart, URL asset đổi nên tránh cache cũ của trình duyệt.
