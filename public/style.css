@@ -1,16 +1,14 @@
 :root {
   color-scheme: dark;
-  --bg: #101215;
-  --bg-2: #171b20;
-  --panel: #1f242b;
-  --panel-soft: #252c35;
-  --line: #333b46;
-  --line-2: #3e4754;
-  --text: #f3f6fb;
-  --text-soft: #aeb8c8;
-  --mint: #4ad7b3;
-  --orange: #ff9a52;
-  --danger: #ff5f79;
+  --bg: #0a0c10;
+  --panel: #131720;
+  --panel-2: #181f2a;
+  --line: #2a3140;
+  --line-strong: #3b4a63;
+  --text: #edf2fb;
+  --muted: #9ca8bc;
+  --accent: #62d0ff;
+  --ok: #78e3bb;
 }
 
 * {
@@ -23,22 +21,22 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 0% -20%, #28303a 0%, transparent 44%),
-    radial-gradient(circle at 100% 120%, #2b241d 0%, transparent 45%),
-    linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    radial-gradient(circle at 8% -10%, rgba(57, 98, 160, 0.2) 0%, transparent 42%),
+    radial-gradient(circle at 100% 120%, rgba(43, 88, 131, 0.16) 0%, transparent 45%),
+    linear-gradient(180deg, #0b0e14 0%, var(--bg) 100%);
 }
 
 .shell {
-  max-width: 1180px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 18px 18px;
+  padding: 24px 18px 20px;
 }
 
 .masthead {
   display: flex;
   justify-content: space-between;
-  gap: 14px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
@@ -48,22 +46,20 @@ body {
 }
 
 .brand {
-  color: #f6f2ea;
+  color: #f5f8ff;
   text-decoration: none;
-  font-size: 42px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  line-height: 1;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
 }
 
 .subtitle {
   margin: 0;
-  color: var(--text-soft);
+  color: var(--muted);
   font-size: 12px;
-  letter-spacing: 0.05em;
   display: inline-flex;
-  gap: 7px;
   align-items: center;
+  gap: 6px;
 }
 
 .head-actions,
@@ -74,34 +70,27 @@ body {
 
 .control-btn {
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, #2b3340 0%, #222833 100%);
+  background: linear-gradient(180deg, #1a2230 0%, #141b27 100%);
   color: var(--text);
-  border-radius: 13px;
+  border-radius: 12px;
   padding: 8px 12px;
-  font: inherit;
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
+  transition: background 0.16s ease, border-color 0.16s ease;
 }
 
 .control-btn:hover,
 .control-btn:focus-visible {
-  border-color: #4c5869;
-  background: linear-gradient(180deg, #363f4d 0%, #28303d 100%);
-  transform: translateY(-1px);
-}
-
-.control-btn:disabled {
-  opacity: 0.55;
-  transform: none;
-  cursor: default;
+  border-color: var(--line-strong);
+  background: linear-gradient(180deg, #202c3e 0%, #172131 100%);
 }
 
 .control-btn.emphasis {
-  border-color: #5f4a39;
-  background: linear-gradient(180deg, #5d4535 0%, #483729 100%);
+  border-color: #33536d;
+  background: linear-gradient(180deg, #24415a 0%, #1c3145 100%);
 }
 
 .control-btn.copy {
@@ -111,14 +100,11 @@ body {
 .android-note {
   margin: 0 0 10px;
   padding: 9px 11px;
-  border: 1px solid #4a4f57;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  background: rgba(42, 46, 52, 0.6);
-  color: #c8cfda;
+  background: rgba(19, 28, 40, 0.72);
+  color: #b4c4dc;
   font-size: 12px;
-  display: inline-flex;
-  gap: 7px;
-  align-items: center;
 }
 
 .android-note[hidden] {
@@ -127,7 +113,7 @@ body {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 350px;
+  grid-template-columns: minmax(0, 1fr) 330px;
   gap: 14px;
   align-items: start;
 }
@@ -135,45 +121,48 @@ body {
 .arena,
 .intel-card {
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: linear-gradient(180deg, #232a33 0%, #1d242d 100%);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
+}
+
+.arena {
+  max-width: 760px;
 }
 
 .arena-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
-  padding: 13px;
+  gap: 8px;
+  padding: 12px;
 }
 
 .status-live {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-  color: #ffe8e1;
-  background: rgba(255, 99, 121, 0.2);
-  border: 1px solid rgba(255, 99, 121, 0.5);
+  border: 1px solid rgba(98, 208, 255, 0.5);
   border-radius: 999px;
-  padding: 2px 8px;
+  padding: 2px 9px;
+  background: rgba(98, 208, 255, 0.14);
+  color: #d6f4ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   margin-bottom: 8px;
 }
 
 .arena-meta h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
-  color: #fff6e7;
 }
 
 .arena-meta p {
   margin: 6px 0 0;
+  color: var(--muted);
   font-size: 13px;
-  color: var(--text-soft);
 }
 
 .arena-actions .control-btn {
@@ -189,10 +178,10 @@ body {
 .warning-bar {
   margin: 0 12px 10px;
   padding: 8px 10px;
-  border: 1px solid rgba(255, 171, 89, 0.55);
+  border: 1px solid rgba(232, 184, 115, 0.52);
   border-radius: 10px;
-  background: rgba(88, 62, 32, 0.52);
-  color: #ffd6a4;
+  background: rgba(96, 71, 41, 0.55);
+  color: #ffe0b6;
   font-size: 11px;
 }
 
@@ -204,16 +193,16 @@ body {
   position: relative;
   margin: 0 12px 12px;
   border-radius: 12px;
+  border: 1px solid #33445c;
   overflow: hidden;
-  border: 1px solid var(--line-2);
-  background: #161c25;
+  background: #111823;
   aspect-ratio: 1 / 1;
 }
 
 canvas {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   touch-action: manipulation;
   cursor: pointer;
 }
@@ -226,15 +215,13 @@ canvas {
   justify-content: center;
   text-align: center;
   padding: 24px;
-  pointer-events: none;
-  color: #e8edf8;
+  color: #e8f2ff;
   font-size: 34px;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
+  pointer-events: none;
   background:
-    radial-gradient(circle at 20% 18%, rgba(95, 173, 255, 0.2), transparent 42%),
-    radial-gradient(circle at 78% 20%, rgba(126, 120, 255, 0.18), transparent 40%),
-    radial-gradient(circle at 68% 84%, rgba(69, 144, 255, 0.14), transparent 36%),
-    linear-gradient(180deg, rgba(16, 27, 45, 0.92), rgba(11, 19, 33, 0.96));
+    radial-gradient(circle at 20% 18%, rgba(98, 208, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(108, 139, 255, 0.18), transparent 38%),
+    linear-gradient(180deg, rgba(18, 28, 42, 0.9), rgba(14, 21, 33, 0.95));
 }
 
 .map-message[hidden] {
@@ -242,13 +229,12 @@ canvas {
 }
 
 .intel-card {
-  padding: 15px;
+  padding: 14px;
 }
 
 .intel-card h2 {
   margin: 0 0 12px;
-  font-size: 30px;
-  color: #fff6e7;
+  font-size: 36px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -262,11 +248,11 @@ dl {
 dl div {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   align-items: baseline;
   padding: 8px 0;
-  border-bottom: 1px dashed #3a444f;
-  font-size: 17px;
+  border-bottom: 1px dashed #354357;
+  font-size: 18px;
 }
 
 dl div:last-child {
@@ -274,7 +260,7 @@ dl div:last-child {
 }
 
 dt {
-  color: var(--text-soft);
+  color: var(--muted);
   display: inline-flex;
   gap: 7px;
   align-items: center;
@@ -288,37 +274,37 @@ dd {
 }
 
 #room {
-  color: #ffd08f;
-  letter-spacing: 0.09em;
+  color: #f4dc9f;
+  letter-spacing: 0.08em;
 }
 
 #latency {
-  color: var(--mint);
+  color: var(--ok);
 }
 
 .share-caption {
-  margin: 12px 0 6px;
-  color: var(--text-soft);
+  margin: 11px 0 6px;
+  color: var(--muted);
   font-size: 13px;
 }
 
 code {
   display: block;
   padding: 9px 10px;
-  border: 1px solid #3b4654;
   border-radius: 10px;
-  background: rgba(17, 24, 32, 0.95);
-  color: #dbe3f2;
-  font-size: 14px;
+  border: 1px solid #3a4b63;
+  background: #111a26;
+  color: #d8e5f8;
+  font-size: 15px;
   word-break: break-all;
 }
 
 #pip-video {
   position: absolute;
-  width: 1px;
-  height: 1px;
   right: 0;
   bottom: 0;
+  width: 1px;
+  height: 1px;
   opacity: 0.01;
   pointer-events: none;
 }
@@ -342,7 +328,7 @@ body.compact .workspace {
 }
 
 body.compact .arena {
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
 body.compact .arena-top {
@@ -354,7 +340,7 @@ body.compact .status-live {
 }
 
 body.compact .arena-meta h1 {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 body.compact .arena-meta p {
@@ -388,12 +374,6 @@ body.compact .android-note {
   display: none;
 }
 
-@media (min-width: 861px) {
-  .arena {
-    max-width: 760px;
-  }
-}
-
 @media (max-width: 860px) {
   .shell {
     max-width: 530px;
@@ -401,7 +381,7 @@ body.compact .android-note {
   }
 
   .brand {
-    font-size: 31px;
+    font-size: 30px;
   }
 
   .arena-meta h1 {
@@ -413,7 +393,7 @@ body.compact .android-note {
   }
 
   .intel-card h2 {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   dl div {
