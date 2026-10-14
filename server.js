@@ -126,6 +126,14 @@ function renderIndex(res) {
   res.sendFile(INDEX_PATH);
 }
 
+app.get("/v3/:matchId([A-Za-z0-9]{6})", (_req, res) => {
+  renderIndex(res);
+});
+
+app.get("/v3", (_req, res) => {
+  renderIndex(res);
+});
+
 app.get("/webmap/:matchId", (_req, res) => {
   renderIndex(res);
 });

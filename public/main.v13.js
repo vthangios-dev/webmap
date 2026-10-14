@@ -5,6 +5,7 @@
   const canvas = $("map");
   const ctx = canvas.getContext("2d");
   const LOGICAL_MAP_SIZE = 900;
+  const VIEWER_PREFIX = "/v3";
 
   const android = /Android/i.test(navigator.userAgent);
   const mobile =
@@ -107,15 +108,17 @@
     params.delete("room");
     params.delete("compact");
     if (document.body.classList.contains("compact")) params.set("compact", "1");
-    const basePath = socketState.room ? `/${encodeURIComponent(socketState.room)}` : "/";
+    const basePath = socketState.room
+      ? `${VIEWER_PREFIX}/${encodeURIComponent(socketState.room)}`
+      : VIEWER_PREFIX;
     history.replaceState(null, "", basePath + (params.size ? "?" + params.toString() : ""));
   }
 
   function updateShare() {
     const room = socketState.room;
     const share = room
-      ? `${location.origin}/${encodeURIComponent(room)}`
-      : `${location.origin}/`;
+      ? `${location.origin}${VIEWER_PREFIX}/${encodeURIComponent(room)}`
+      : `${location.origin}${VIEWER_PREFIX}/`;
     $("share-url").textContent = share;
   }
 
@@ -510,7 +513,7 @@
         notice("Vào phòng trước khi mở cửa sổ nhỏ");
         return;
       }
-      const url = `/${encodeURIComponent(socketState.room)}?compact=1`;
+      const url = `${VIEWER_PREFIX}/${encodeURIComponent(socketState.room)}?compact=1`;
       if (!window.open(url, "vthangios-map", "popup,width=380,height=455,resizable=yes")) {
         notice("Trình duyệt đang chặn cửa sổ bật lên");
       }
@@ -573,12 +576,15 @@
   function readURL() {
     const params = new URLSearchParams(location.search);
     let room = params.get("room") || "";
-    const shortPathMatch = location.pathname.match(/^\/([A-Za-z0-9]{6})$/);
+    const shortPathMatch = location.pathname.match(/^\/v3\/([A-Za-z0-9]{6})$/);
+    const rootPathMatch = location.pathname.match(/^\/([A-Za-z0-9]{6})$/);
     const legacyPathMatch = location.pathname.match(/\/webmap\/([A-Za-z0-9]{6})$/);
     const roomFromPath = !room
       ? shortPathMatch
         ? shortPathMatch[1]
-        : legacyPathMatch
+        : rootPathMatch
+          ? rootPathMatch[1]
+          : legacyPathMatch
           ? legacyPathMatch[1]
           : ""
       : "";
