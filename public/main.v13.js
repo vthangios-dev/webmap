@@ -26,22 +26,18 @@
   let pipTimer = 0;
   let pipBusy = false;
   let canvasScale = 1;
-  const RENDER_MIN_INTERVAL_MS = 33;
-  let renderQueued = false;
-  let renderForce = false;
-  let lastRenderTime = 0;
   const heroIconCache = new Map();
   const ESP_ICON_SIZE = 70;
   const mapImage = new Image();
   let mapImageRetried = false;
-  mapImage.onload = () => scheduleRender(true);
+  mapImage.onload = () => renderMap();
   mapImage.onerror = () => {
     if (!mapImageRetried) {
       mapImageRetried = true;
       mapImage.src = "/assets/icons/map.png";
       return;
     }
-    scheduleRender(true);
+    renderMap();
   };
   mapImage.src = "/assets/icons/map.png";
 
@@ -76,23 +72,7 @@
     if ("imageSmoothingQuality" in ctx) {
       ctx.imageSmoothingQuality = "high";
     }
-    scheduleRender(true);
-  }
-
-  function scheduleRender(force = false) {
-    renderForce = renderForce || force;
-    if (renderQueued) return;
-    renderQueued = true;
-    requestAnimationFrame((ts) => {
-      renderQueued = false;
-      if (!renderForce && ts - lastRenderTime < RENDER_MIN_INTERVAL_MS) {
-        scheduleRender(false);
-        return;
-      }
-      renderForce = false;
-      lastRenderTime = ts;
-      renderMap();
-    });
+    renderMap();
   }
 
   function status(text) {
@@ -165,7 +145,7 @@
     socketState.lastSeq = 0;
     socketState.lastReceived = 0;
     $("age").textContent = "Chưa có dữ liệu";
-    scheduleRender(true);
+    renderMap();
   }
 
   function chooseRoom(code, writeURL = true) {
@@ -241,8 +221,8 @@
               ? `Góc nhìn Team ${parsed.camp} • Minimap tĩnh + icon realtime`
               : "Đang nhận minimap + icon realtime");
             $("age").textContent = "Cập nhật vài giây trước";
-            scheduleRender();
-            if (document.hidden && pipState()) scheduleRender(true);
+            renderMap();
+            if (document.hidden && pipState()) renderMap();
           } else if (payload.type === "pong" && Number.isFinite(payload.at)) {
             const rtt = performance.now() - payload.at;
           }
@@ -299,7 +279,7 @@
       const popupButton = $("popup");
       if (popupButton) popupButton.setAttribute("aria-pressed", String(open));
     }
-    if (open) pipTimer = setInterval(() => scheduleRender(), 33);
+    if (open) pipTimer = setInterval(renderMap, 16);
   }
 
   async function togglePip() {
@@ -580,7 +560,7 @@
   };
 
   addEventListener("visibilitychange", () => {
-    if (document.hidden && pipState()) scheduleRender(true);
+    if (document.hidden && pipState()) renderMap();
   });
 
   addEventListener("pagehide", (e) => {
@@ -628,12 +608,12 @@
     if (socketState.ws?.readyState === WebSocket.OPEN) {
       socketState.ws.send(JSON.stringify({ type: "ping", at: performance.now() }));
     }
-    scheduleRender();
+    renderMap();
   }, 2000);
 
   setupCanvasResolution();
   readURL();
   updateShare();
   syncPipButton();
-  scheduleRender(true);
+  renderMap();
 })();
