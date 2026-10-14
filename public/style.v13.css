@@ -109,6 +109,10 @@ body {
   gap: 0;
 }
 
+.control-btn.icon-only .btn-text {
+  display: none;
+}
+
 .android-note {
   margin: 0 0 10px;
   padding: 9px 11px;
