@@ -34,7 +34,7 @@
   mapImage.onerror = () => {
     if (!mapImageRetried) {
       mapImageRetried = true;
-      mapImage.src = "/assets/icons/map2.png";
+      mapImage.src = "/assets/icons/map.png?v=20261014";
       return;
     }
     renderMap();
