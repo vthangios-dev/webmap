@@ -369,10 +369,11 @@
       if (icon?.complete && icon.naturalWidth > 0) {
         const srcW = icon.naturalWidth;
         const srcH = icon.naturalHeight;
-        const sx = 0;
-        const sy = 0;
-        const sw = Math.max(1, srcW);
-        const sh = Math.max(1, srcH);
+        const srcInset = Math.round(Math.min(srcW, srcH) * 0.16);
+        const sx = srcInset;
+        const sy = srcInset;
+        const sw = Math.max(1, srcW - srcInset * 2);
+        const sh = Math.max(1, srcH - srcInset * 2);
         ctx.save();
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
