@@ -34,12 +34,12 @@
   mapImage.onerror = () => {
     if (!mapImageRetried) {
       mapImageRetried = true;
-      mapImage.src = "/assets/icons/map.png?v=20261014";
+      mapImage.src = "/assets/icons/map.png";
       return;
     }
     renderMap();
   };
-  mapImage.src = "/assets/icons/map.png?v=20261014";
+  mapImage.src = "/assets/icons/map.png";
 
   function clamp01(value) {
     const n = Number(value);
