@@ -39,7 +39,7 @@
     }
     renderMap();
   };
-  mapImage.src = "/assets/icons/map2.png?v=20261014";
+  mapImage.src = "/assets/icons/map.png?v=20261014";
 
   function clamp01(value) {
     const n = Number(value);
