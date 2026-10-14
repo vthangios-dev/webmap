@@ -27,7 +27,6 @@
   let pipBusy = false;
   let canvasScale = 1;
   const heroIconCache = new Map();
-  const heroIconScaledCache = new Map();
   const ESP_ICON_SIZE = 70;
   const mapImage = new Image();
   let mapImageRetried = false;
@@ -62,35 +61,10 @@
     return img;
   }
 
-  function getScaledHeroIcon(heroId, radius, sourceIcon) {
-    if (!heroId || !sourceIcon || !sourceIcon.complete || sourceIcon.naturalWidth <= 0) {
-      return null;
-    }
-    const diameter = Math.max(8, Math.round(radius * 2));
-    const cacheKey = `${heroId}:${diameter}:${canvasScale}`;
-    const cached = heroIconScaledCache.get(cacheKey);
-    if (cached) return cached;
-
-    const targetPx = Math.max(8, Math.round(diameter * canvasScale));
-    const buffer = document.createElement("canvas");
-    buffer.width = targetPx;
-    buffer.height = targetPx;
-    const bctx = buffer.getContext("2d");
-    if (!bctx) return sourceIcon;
-    bctx.imageSmoothingEnabled = true;
-    if ("imageSmoothingQuality" in bctx) {
-      bctx.imageSmoothingQuality = "high";
-    }
-    bctx.drawImage(sourceIcon, 0, 0, sourceIcon.naturalWidth, sourceIcon.naturalHeight, 0, 0, targetPx, targetPx);
-    heroIconScaledCache.set(cacheKey, buffer);
-    return buffer;
-  }
-
   function setupCanvasResolution() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     if (dpr === canvasScale) return;
     canvasScale = dpr;
-    heroIconScaledCache.clear();
     canvas.width = Math.round(LOGICAL_MAP_SIZE * dpr);
     canvas.height = Math.round(LOGICAL_MAP_SIZE * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -393,14 +367,17 @@
       const radius = self ? Math.round(ESP_ICON_SIZE * 0.68) : Math.round(ESP_ICON_SIZE * 0.63);
       const icon = getHeroIcon(actor.heroId);
       if (icon?.complete && icon.naturalWidth > 0) {
-        const scaledIcon = getScaledHeroIcon(actor.heroId, radius, icon) || icon;
-        const srcW = scaledIcon.naturalWidth || scaledIcon.width || icon.naturalWidth;
-        const srcH = scaledIcon.naturalHeight || scaledIcon.height || icon.naturalHeight;
+        const srcW = icon.naturalWidth;
+        const srcH = icon.naturalHeight;
+        const sx = 0;
+        const sy = 0;
+        const sw = Math.max(1, srcW);
+        const sh = Math.max(1, srcH);
         ctx.save();
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(scaledIcon, 0, 0, srcW, srcH, x - radius, y - radius, radius * 2, radius * 2);
+        ctx.drawImage(icon, sx, sy, sw, sh, x - radius, y - radius, radius * 2, radius * 2);
         ctx.restore();
       } else {
         ctx.beginPath();
