@@ -70,7 +70,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = true;
     if ("imageSmoothingQuality" in ctx) {
-      ctx.imageSmoothingQuality = "high";
+      ctx.imageSmoothingQuality = "medium";
     }
     renderMap();
   }
