@@ -34,12 +34,12 @@
   mapImage.onerror = () => {
     if (!mapImageRetried) {
       mapImageRetried = true;
-      mapImage.src = "/assets/icons/map.png";
+      mapImage.src = "/assets/icons/map.jpg";
       return;
     }
     renderMap();
   };
-  mapImage.src = "/assets/icons/map.png";
+  mapImage.src = "/assets/icons/map.jpg";
 
   function clamp01(value) {
     const n = Number(value);
@@ -369,11 +369,10 @@
       if (icon?.complete && icon.naturalWidth > 0) {
         const srcW = icon.naturalWidth;
         const srcH = icon.naturalHeight;
-        const srcInset = Math.round(Math.min(srcW, srcH) * 0.08);
-        const sx = srcInset;
-        const sy = srcInset;
-        const sw = Math.max(1, srcW - srcInset * 2);
-        const sh = Math.max(1, srcH - srcInset * 2);
+        const sx = 0;
+        const sy = 0;
+        const sw = Math.max(1, srcW);
+        const sh = Math.max(1, srcH);
         ctx.save();
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
